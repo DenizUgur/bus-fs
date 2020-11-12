@@ -51,7 +51,6 @@ app.use(
 		origin: "https://bus-fs.herokuapp.com/",
 		credentials: true,
 		preflightContinue: true,
-		exposedHeaders: ["set-cookie"],
 	})
 );
 app.use(bodyParser.json());
