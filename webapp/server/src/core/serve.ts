@@ -7,13 +7,15 @@ const router = Router();
 const exec_prom = util.promisify(exec);
 
 router.get("/", (req, res) => {
+	//TODO: Hard-coded type. (Session does not work)
+	let type = "hw4"; //req.session.type;
 	exec_prom(
-		`python3 ../worker/app.py ${req.session.type} ${req.user.id || ""}`
+		`python3 ../worker/app.py ${type} ${req.user.id || ""}`
 	)
 		.then(() => {
 			res.download(
-				`../data/out/${req.user.id}_${req.session.type}.xlsm`,
-				`${req.user.id}_${req.session.type}.xlsm`,
+				`../data/out/${req.user.id}_${type}.xlsm`,
+				`${req.user.id}_${type}.xlsm`,
 				(err) => {
 					if (err) {
 						console.error(err);
@@ -26,7 +28,7 @@ router.get("/", (req, res) => {
 						});
 					}
 					fs.unlinkSync(
-						`../data/out/${req.user.id}_${req.session.type}.xlsm`
+						`../data/out/${req.user.id}_${type}.xlsm`
 					);
 				}
 			);
