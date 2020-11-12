@@ -24,7 +24,7 @@ app.use(
 		store: new RedisStore({ client: redisClient, ttl: 1000 * 60 * 15 }),
 		secret: process.env.SESSION_KEY || "",
 		resave: false,
-		saveUninitialized: true,
+		saveUninitialized: false,
 		cookie: { secure: true },
 	})
 );
@@ -51,6 +51,7 @@ app.use(
 		origin: "https://bus-fs.herokuapp.com/",
 		credentials: true,
 		preflightContinue: true,
+		exposedHeaders: ["set-cookie"],
 	})
 );
 app.use(bodyParser.json());
