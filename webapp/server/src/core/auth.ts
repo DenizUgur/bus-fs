@@ -14,7 +14,6 @@ const list = require("../../../data/users/students.json");
 const listTA = require("../../../data/users/TAs.json");
 
 router.get("/login", (req, res) => {
-	console.log("/auth/login :: session", req.session);
 	//* PKCE Prerequisites
 	const base64Digest = crypto
 		.createHash("sha256")
@@ -33,14 +32,15 @@ router.get("/login", (req, res) => {
 		state: nanoid(),
 		code_challenge,
 		code_challenge_method: "S256",
-		...(req.session.prompt && { prompt: "login" }),
+		...(req.session.prompt && { prompt: "consent" }),
 	})}`;
+
+	console.log(redirect_uri);
 
 	res.redirect(redirect_uri);
 });
 
 router.get("/callback", async (req, res) => {
-	console.log("/auth/callback :: session", req.session);
 	//* Handle Error
 	if (req.query.error) {
 		if (req.query.error == "interaction_required") {

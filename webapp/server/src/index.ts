@@ -77,7 +77,6 @@ app.get("/:type", (req, res, next) => {
 	 * @param {param} type => Homework type
 	 * @param {query} manual => Change prompt type
 	 */
-	console.log("/:type :: session", req.session);
 	//* Save request to session before redirect
 	if (req.params.type != "hw4") {
 		return res.render("index", {
