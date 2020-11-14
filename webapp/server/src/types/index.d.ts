@@ -5,10 +5,6 @@ declare namespace Express {
 			level: number;
 			id: string | null;
 		};
-		session: {
-			type: string;
-			save: any;
-			reload: any;
-		};
+		session: any;
 	}
 }

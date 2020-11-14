@@ -14,6 +14,7 @@ const list = require("../../../data/users/students.json");
 const listTA = require("../../../data/users/TAs.json");
 
 router.get("/login", (req, res) => {
+	console.log("/auth/login :: session", req.session);
 	//* PKCE Prerequisites
 	const base64Digest = crypto
 		.createHash("sha256")
@@ -32,14 +33,22 @@ router.get("/login", (req, res) => {
 		state: nanoid(),
 		code_challenge,
 		code_challenge_method: "S256",
+		...(req.session.prompt && { prompt: "login" }),
 	})}`;
 
 	res.redirect(redirect_uri);
 });
 
 router.get("/callback", async (req, res) => {
+	console.log("/auth/callback :: session", req.session);
 	//* Handle Error
 	if (req.query.error) {
+		if (req.query.error == "interaction_required") {
+			req.session.prompt = true;
+			return req.session.save((error: any) => {
+				return res.redirect("/auth/login");
+			});
+		}
 		return res.render("error", {
 			title: "401 Error",
 			message: "401",

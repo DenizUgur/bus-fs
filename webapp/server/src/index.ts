@@ -16,19 +16,6 @@ app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "views"));
 app.use("/assets", express.static(path.join(__dirname, "assets")));
 
-const RedisStore = require("connect-redis")(session);
-const redisClient = redis.createClient(process.env.REDIS_URL || "");
-
-app.use(
-	session({
-		store: new RedisStore({ client: redisClient, ttl: 1000 * 60 * 15 }),
-		secret: process.env.SESSION_KEY || "",
-		resave: false,
-		saveUninitialized: false,
-		cookie: { secure: true },
-	})
-);
-
 app.use(
 	helmet({
 		contentSecurityPolicy: {
@@ -56,6 +43,19 @@ app.use(
 app.use(bodyParser.json());
 app.use(cookieParser());
 
+const RedisStore = require("connect-redis")(session);
+const redisClient = redis.createClient(process.env.REDIS_URL || "");
+
+app.use(
+	session({
+		store: new RedisStore({ client: redisClient, ttl: 1000 * 60 * 15 }),
+		secret: process.env.SESSION_KEY || "",
+		resave: false,
+		saveUninitialized: true,
+		cookie: { secure: true },
+	})
+);
+
 //////////////////////////
 //		APP START		//
 //////////////////////////
@@ -72,7 +72,12 @@ app.use("/serve", [
 ]);
 app.use("/auth", routerAuth);
 
-app.get("/:type", async (req, res, next) => {
+app.get("/:type", (req, res, next) => {
+	/**
+	 * @param {param} type => Homework type
+	 * @param {query} manual => Change prompt type
+	 */
+	console.log("/:type :: session", req.session);
 	//* Save request to session before redirect
 	if (req.params.type != "hw4") {
 		return res.render("index", {
@@ -81,8 +86,9 @@ app.get("/:type", async (req, res, next) => {
 		});
 	}
 	req.session.type = req.params.type;
+	req.session.prompt = req.query.manual == "1";
 
-	await req.session.save(async (error: any) => {
+	req.session.save((error: any) => {
 		if (error) return next(error);
 		return res.redirect("/serve");
 	});

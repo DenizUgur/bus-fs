@@ -7,6 +7,8 @@ const router = Router();
 const exec_prom = util.promisify(exec);
 
 router.get("/", (req, res) => {
+	//TODO: Solve session problem
+	console.log("/serve :: session", req.session);
 	const type = req.session.type || "hw4";
 	exec_prom(
 		`python3 ../worker/app.py ${type} ${req.user.id || ""}`
