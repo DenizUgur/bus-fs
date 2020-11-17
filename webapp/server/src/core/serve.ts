@@ -7,6 +7,7 @@ const router = Router();
 const exec_prom = util.promisify(exec);
 
 router.get("/", (req, res) => {
+	//TODO: Change fallback behavior
 	const type = req.session.type || "hw4";
 	exec_prom(
 		`python3 ../worker/app.py ${type} ${req.user.id || ""}`

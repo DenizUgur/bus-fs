@@ -35,8 +35,6 @@ router.get("/login", (req, res) => {
 		...(req.session.prompt && { prompt: "consent" }),
 	})}`;
 
-	console.log(redirect_uri);
-
 	res.redirect(redirect_uri);
 });
 
