@@ -9,17 +9,17 @@ if __name__ == "__main__":
 
     # Template specific constant
     key_sheet = "KEY"
-    id_cell = "A1"
+    id_cell = "C4"
 
     # Get the template file
-    wb = load_workbook("../data/templates/{}_temp.xlsm".format(temp_file), keep_vba=True)
+    wb = load_workbook("../data/templates/{}_template.xlsm".format(temp_file), keep_vba=True)
 
     # Get the KEY sheet
     ws = wb[key_sheet]
 
     # Protect the KEY sheet
     ws.protection.sheet = True
-    ws.protection.password = '#!...'
+    ws.protection.password = '#...'
     ws.protection.enable()
     ws.sheet_state = 'veryHidden'
 
