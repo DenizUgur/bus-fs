@@ -7,11 +7,17 @@ const router = Router();
 const exec_prom = util.promisify(exec);
 
 router.get("/", (req, res) => {
+	res.render("index", {
+		title: "BUS File Service",
+		message: "Your file is currently being prepared. Please wait...",
+		serve: true,
+	});
+});
+
+router.get("/download", (req, res) => {
 	//TODO: Change fallback behavior
 	const type = req.session.type || "hw4";
-	exec_prom(
-		`python3 ../worker/app.py ${type} ${req.user.id || ""}`
-	)
+	exec_prom(`python3 ../worker/app.py ${type} ${req.user.id || ""}`)
 		.then(() => {
 			res.download(
 				`../data/out/${req.user.id}_${type}.xlsm`,
@@ -27,9 +33,7 @@ router.get("/", (req, res) => {
 								"Sorry to see you here, please report us what happend so that we can help you",
 						});
 					}
-					fs.unlinkSync(
-						`../data/out/${req.user.id}_${type}.xlsm`
-					);
+					fs.unlinkSync(`../data/out/${req.user.id}_${type}.xlsm`);
 				}
 			);
 		})

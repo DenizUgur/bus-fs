@@ -82,6 +82,7 @@ app.get("/:type", (req, res, next) => {
 		return res.render("index", {
 			title: "BUS File Service",
 			message: "This homework is not available yet.",
+			serve: false,
 		});
 	}
 	req.session.type = req.params.type;

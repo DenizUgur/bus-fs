@@ -154,6 +154,7 @@ const isValidUser = (req: Request, res: Response, next: any) => {
 		return res.render("index", {
 			title: "BUS File Service",
 			message: `${req.user.mail} is not enrolled to this course.`,
+			serve: false,
 		});
 	}
 };
