@@ -4,7 +4,7 @@ import { RateLimiterPostgres } from "rate-limiter-flexible";
 const opts = {
 	keyPrefix: "rlDefault",
 	storeClient: sequelize,
-	points: 5, // Number of available points
+	points: 10, // Number of available points
 	duration: 60, // Per minute
 	tableName: "ratelimit",
 	tableCreated: true,
