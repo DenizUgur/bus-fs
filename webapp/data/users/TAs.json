@@ -4,7 +4,7 @@
   { "id": "CanerA", "email": "caner.araz@ozu.edu.tr" },
   { "id": "AlperA", "email": "alper.akin@ozu.edu.tr" },
   { "id": "AliKaan", "email": "kaan.kurbanzade@ozu.edu.tr" },
-  { "id": "DenizU", "email": "deniz.ugur@ozu.edu.tr" },
+  { "id": "S014557", "email": "deniz.ugur@ozu.edu.tr" },
   { "id": "UtkuK", "email": "utku.kurban@ozu.edu.tr" },
   { "id": "PelinÖ", "email": "pelin.ozturk@ozu.edu.tr" },
   { "id": "MaxG", "email": "alp.gruder@ozu.edu.tr" },
@@ -16,8 +16,8 @@
   { "id": "MuratcanK", "email": "muratcan.kilicci@ozu.edu.tr" },
   { "id": "DefneS", "email": "defne.seymen@ozu.edu.tr" },
   { "id": "CerenT", "email": "ceren.tan@ozu.edu.tr" },
-  { "id": "BaşakB", "email": "basak.balci@ozu.edu.tr" },
-  { "id": "BeratD", "email": "berat.dalgar@ozu.edu.tr" },
+  { "id": "S018010", "email": "basak.balci@ozu.edu.tr" },
+  { "id": "S020623", "email": "berat.dalgar@ozu.edu.tr" },
   { "id": "EmreK", "email": "emre.kenar@ozu.edu.tr" },
   { "id": "SelinA", "email": "selin.aktok@ozu.edu.tr" },
   { "id": "MelisaK", "email": "melisa.karakullukcu@ozu.edu.tr" },
@@ -31,5 +31,5 @@
   { "id": "IrmakK", "email": "irmak.kizilirmak@ozu.edu.tr" },
   { "id": "BerkinT", "email": "berkin.tan@ozu.edu.tr" },
   { "id": "AlperenZ", "email": "alperen.zengin@ozu.edu.tr" },
-  { "id": "EceK", "email": "ece.kestek@ozu.edu.tr" }
+  { "id": "S020732", "email": "ece.kestek@ozu.edu.tr" }
 ]
