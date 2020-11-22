@@ -37,5 +37,25 @@ const RateLimit = sequelize.define(
 	}
 );
 
+const Stats = sequelize.define(
+	"stats",
+	{
+		ip: {
+			type: DataTypes.STRING,
+		},
+		session: {
+			type: DataTypes.STRING,
+		},
+		userAgent: {
+			type: DataTypes.STRING,
+		},
+	},
+	{
+		freezeTableName: true,
+		createdAt: false,
+		updatedAt: false,
+	}
+);
+
 export default sequelize;
-export { RateLimit };
+export { RateLimit, Stats };

@@ -144,9 +144,12 @@ const isAuthenticated = (req: Request, res: Response, next: any) => {
 };
 
 const isValidUser = (req: Request, res: Response, next: any) => {
-	const user = list
-		.concat(listTA)
-		.find((el: any) => el.email === req.user.mail);
+	// TODO: Hard-coding assistant only option
+	// const user = list
+	// 	.concat(listTA)
+	// 	.find((el: any) => el.email === req.user.mail);
+	const user = listTA.find((el: any) => el.email === req.user.mail);
+
 	if (user) {
 		req.user.id = user.id;
 		return next();

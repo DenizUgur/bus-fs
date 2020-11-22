@@ -37,7 +37,7 @@ app.use(
 	cors({
 		origin: "https://bus-fs.herokuapp.com/",
 		credentials: true,
-		preflightContinue: true,
+		allowedHeaders: "Content-Type, Set-Cookie",
 	})
 );
 app.use(bodyParser.json());

@@ -2,6 +2,7 @@ import { Router } from "express";
 import util from "util";
 import { exec } from "child_process";
 import fs from "fs";
+import { Stats } from "../db";
 
 const router = Router();
 const exec_prom = util.promisify(exec);
@@ -14,9 +15,15 @@ router.get("/", (req, res) => {
 	});
 });
 
-router.get("/download", (req, res) => {
+router.get("/download", async (req, res) => {
 	//TODO: Change fallback behavior
 	const type = req.session.type || "hw4";
+	await Stats.create({
+		ip: req.ip,
+		session: req.session.type || "N/A",
+		userAgent: req.headers["user-agent"] || "N/A",
+	});
+
 	exec_prom(`python3 ../worker/app.py ${type} ${req.user.id || ""}`)
 		.then(() => {
 			res.download(
