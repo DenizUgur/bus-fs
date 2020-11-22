@@ -41,7 +41,10 @@ router.get("/login", (req, res) => {
 router.get("/callback", async (req, res) => {
 	//* Handle Error
 	if (req.query.error) {
-		if (req.query.error == "interaction_required") {
+		if (
+			req.query.error == "interaction_required" ||
+			req.query.error == "invalid_grant"
+		) {
 			req.session.prompt = true;
 			return req.session.save((error: any) => {
 				return res.redirect("/auth/login");
@@ -115,12 +118,25 @@ router.get("/callback", async (req, res) => {
 		return res.redirect("/serve");
 	} catch (error: AxiosError | any) {
 		console.error(error);
-		return res.render("error", {
-			title: "500 Error",
-			message: "500",
-			subtitle: "Internal Server Error",
-			description:
-				"Sorry to see you here, please report us what happend so that we can help you",
+		if (req.session.errors) {
+			req.session.errors++;
+
+			if (req.session.errors == 3) {
+				return res.render("error", {
+					title: "500 Error",
+					message: "500",
+					subtitle: "Internal Server Error",
+					description:
+						"Sorry to see you here, please report us what happend so that we can help you",
+				});
+			}
+		} else {
+			req.session.errors = 1;
+		}
+
+		req.session.prompt = true;
+		return req.session.save((error: any) => {
+			return res.redirect("/auth/login");
 		});
 	}
 });
