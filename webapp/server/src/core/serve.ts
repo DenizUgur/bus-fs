@@ -2,6 +2,7 @@ import { Router } from "express";
 import util from "util";
 import { exec } from "child_process";
 import fs from "fs";
+import { Stats } from "../db";
 
 const router = Router();
 const exec_prom = util.promisify(exec);
@@ -9,7 +10,7 @@ const exec_prom = util.promisify(exec);
 router.get("/", (req, res) => {
 	res.render("index", {
 		title: "BUS File Service",
-		message: "Your file is currently being prepared. Please wait...",
+		message: `Hi ${req.user.displayName}, your file is currently being prepared. Please wait...`,
 		serve: true,
 	});
 });
@@ -17,7 +18,10 @@ router.get("/", (req, res) => {
 router.get("/download", async (req, res) => {
 	//TODO: Change fallback behavior
 	const type = req.session.type || "hw4";
-	console.log("serve ::", req.user)
+	await Stats.create({
+		ip: req.ip,
+		type,
+	});
 	exec_prom(`python3 ../worker/app.py ${type} ${req.user.sid || ""}`)
 		.then(() => {
 			res.download(

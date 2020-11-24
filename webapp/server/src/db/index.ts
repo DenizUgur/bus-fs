@@ -64,5 +64,26 @@ const User = sequelize.define(
 	}
 );
 
+const Stats = sequelize.define(
+	"stats",
+	{
+		id: {
+			type: DataTypes.INTEGER,
+			autoIncrement: true,
+		},
+		ip: {
+			type: DataTypes.STRING,
+		},
+		type: {
+			type: DataTypes.STRING,
+		},
+	},
+	{
+		freezeTableName: true,
+		createdAt: false,
+		updatedAt: false,
+	}
+);
+
 export default sequelize;
-export { RateLimit, User };
+export { RateLimit, User, Stats };
