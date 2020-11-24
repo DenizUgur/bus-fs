@@ -37,17 +37,24 @@ const RateLimit = sequelize.define(
 	}
 );
 
-const Stats = sequelize.define(
-	"stats",
+const User = sequelize.define(
+	"user",
 	{
-		ip: {
+		oid: {
+			type: DataTypes.STRING,
+			primaryKey: true,
+		},
+		displayName: {
 			type: DataTypes.STRING,
 		},
-		session: {
+		email: {
 			type: DataTypes.STRING,
 		},
-		userAgent: {
+		sid: {
 			type: DataTypes.STRING,
+		},
+		ta: {
+			type: DataTypes.BOOLEAN,
 		},
 	},
 	{
@@ -58,4 +65,4 @@ const Stats = sequelize.define(
 );
 
 export default sequelize;
-export { RateLimit, Stats };
+export { RateLimit, User };
