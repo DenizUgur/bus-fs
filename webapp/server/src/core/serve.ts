@@ -20,6 +20,7 @@ router.get("/download", async (req, res) => {
 	const type = req.session.type || "hw4";
 	await Stats.create({
 		ip: req.ip,
+		userAgent: req.headers["user-agent"],
 		type,
 	});
 	exec_prom(`python3 ../worker/app.py ${type} ${req.user.sid || ""}`)

@@ -67,14 +67,13 @@ const User = sequelize.define(
 const Stats = sequelize.define(
 	"stats",
 	{
-		id: {
-			type: DataTypes.INTEGER,
-			autoIncrement: true,
-		},
 		ip: {
 			type: DataTypes.STRING,
 		},
 		type: {
+			type: DataTypes.STRING,
+		},
+		userAgent: {
 			type: DataTypes.STRING,
 		},
 	},
