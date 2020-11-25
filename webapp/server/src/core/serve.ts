@@ -21,7 +21,7 @@ router.get("/download", async (req, res) => {
 	await Stats.create({
 		ip: req.ip,
 		userAgent: req.headers["user-agent"],
-		type,
+		type: req.session.type || "N/A",
 	});
 	exec_prom(`python3 ../worker/app.py ${type} ${req.user.sid || ""}`)
 		.then(() => {
