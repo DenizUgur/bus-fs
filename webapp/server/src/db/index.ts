@@ -56,6 +56,9 @@ const User = sequelize.define(
 		ta: {
 			type: DataTypes.BOOLEAN,
 		},
+		enrolled: {
+			type: DataTypes.BOOLEAN,
+		},
 	},
 	{
 		freezeTableName: true,

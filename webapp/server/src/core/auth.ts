@@ -41,11 +41,14 @@ const getIdByEmail = (email: any) => {
 	let details = {
 		ta: false,
 		sid: "",
+		enrolled: true,
 	};
 
 	if (TA) details.ta = true;
 	if (TA || student) {
 		details.sid = (TA || student).id;
+	} else {
+		details.enrolled = false;
 	}
 	return details;
 };
@@ -97,6 +100,7 @@ passport.use(
 							email: profile._json.email,
 							sid: details.sid,
 							ta: details.ta,
+							enrolled: details.enrolled,
 						});
 						return done(null, profile);
 					} catch (error) {
@@ -158,7 +162,7 @@ router.get("/logout", (req, res) => {
 const isAuthenticated = (req: Request, res: Response, next: any) => {
 	if (req.isAuthenticated()) {
 		if (req.user) {
-			if (req.user.id != "") {
+			if (req.user.enrolled) {
 				return next();
 			}
 		}
