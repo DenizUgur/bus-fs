@@ -131,7 +131,7 @@ router.get(
 	(req, res, next) => {
 		passport.authenticate("azuread-openidconnect", {
 			response: res,
-			failureRedirect: "/",
+			failureRedirect: "/auth/fail",
 		})(req, res, next);
 	},
 	(req, res) => {
@@ -144,13 +144,23 @@ router.post(
 	(req, res, next) => {
 		passport.authenticate("azuread-openidconnect", {
 			response: res,
-			failureRedirect: "/",
+			failureRedirect: "/auth/fail",
 		})(req, res, next);
 	},
 	(req, res) => {
 		res.redirect("/serve");
 	}
 );
+
+router.get("/fail", (req, res) => {
+	res.render("error", {
+		message: "401",
+		subtitle: "Unauthorized",
+		description:
+			"There has been a problem authenticating your profile. Please log out and try again.",
+		mail: false,
+	});
+});
 
 router.get("/logout", (req, res) => {
 	req.session.destroy((err: any) => {
@@ -168,7 +178,7 @@ const isAuthenticated = (req: Request, res: Response, next: any) => {
 		}
 		return res.render("index", {
 			title: "BUS File Service",
-			message: `${req.user.mail} is not enrolled to this course.`,
+			message: `Sorry, you are not enrolled to this course.`,
 			serve: false,
 		});
 	} else {

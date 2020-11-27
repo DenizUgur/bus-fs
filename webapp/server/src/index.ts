@@ -110,6 +110,7 @@ app.use((err: any, req: any, res: any, next: any) => {
 		subtitle: "Internal Server Error",
 		description:
 			"Sorry to see you here, please report us what happend so that we can help you",
+		mail: true,
 	});
 });
 

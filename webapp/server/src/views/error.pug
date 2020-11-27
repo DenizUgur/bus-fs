@@ -23,4 +23,7 @@ html
                     h1=message
                 h2=subtitle
                 p=description
-                a(href="mailto:bus101.backoffice@gmail.com") contact us
+                if mail
+                    a(href="mailto:bus101.backoffice@gmail.com") contact us
+                else
+                    a(href="/auth/logout") log out

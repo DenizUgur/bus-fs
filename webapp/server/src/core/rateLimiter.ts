@@ -28,6 +28,7 @@ const rateLimiterMiddleware = (req: any, res: any, next: any) => {
 					subtitle: "Internal Server Error",
 					description:
 						"Sorry to see you here, please report us what happend so that we can help you",
+					mail: true,
 				});
 			} else {
 				const seconds = (
@@ -38,6 +39,7 @@ const rateLimiterMiddleware = (req: any, res: any, next: any) => {
 					message: "429",
 					subtitle: "Too Many Requests",
 					description: `Please wait ${seconds} seconds before trying again`,
+					mail: true,
 				});
 			}
 		});

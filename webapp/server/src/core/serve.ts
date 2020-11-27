@@ -37,6 +37,7 @@ router.get("/download", async (req, res) => {
 							subtitle: "Internal Server Error",
 							description:
 								"Sorry to see you here, please report us what happend so that we can help you",
+							mail: true,
 						});
 					}
 					fs.unlinkSync(`../data/out/${req.user.sid}_${type}.xlsm`);
@@ -51,6 +52,7 @@ router.get("/download", async (req, res) => {
 				subtitle: "Internal Server Error",
 				description:
 					"Sorry to see you here, please report us what happend so that we can help you",
+				mail: true,
 			});
 		});
 });
