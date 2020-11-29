@@ -54,7 +54,10 @@ if (process.env.NODE_ENV == "production") {
 			secret: process.env.SESSION_KEY || "",
 			resave: false,
 			saveUninitialized: true,
-			cookie: { secure: true },
+			cookie: {
+				secure: true,
+				sameSite: "none",
+			},
 		})
 	);
 } else {
@@ -63,7 +66,10 @@ if (process.env.NODE_ENV == "production") {
 			secret: process.env.SESSION_KEY || "",
 			resave: false,
 			saveUninitialized: true,
-			cookie: { secure: true },
+			cookie: {
+				secure: true,
+				sameSite: "none",
+			},
 		})
 	);
 }
