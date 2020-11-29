@@ -15,7 +15,7 @@ const rateLimiterDefault = new RateLimiterPostgres(opts);
 
 const rateLimiterMiddleware = (req: any, res: any, next: any) => {
 	rateLimiterDefault
-		.consume(req.user.mail, 1)
+		.consume(req.user.email, 1)
 		.then((RLResponse) => {
 			return next();
 		})
