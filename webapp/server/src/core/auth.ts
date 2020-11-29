@@ -16,7 +16,11 @@ passport.serializeUser((user: any, done: any) => {
 passport.deserializeUser(async (oid: any, done: any) => {
 	try {
 		await findByOid(oid, (err: any, user: any) => {
-			done(err, user.dataValues);
+			if (err) {
+				done(err, null);
+			} else {
+				done(err, user.dataValues);
+			}
 		});
 	} catch (error) {
 		done(error, null);
@@ -29,7 +33,7 @@ const findByOid = async (oid: any, fn: any) => {
 			where: { oid },
 		});
 		if (user) return fn(null, user);
-		return fn(null, null);
+		return fn(new Error("No user"), null);
 	} catch (error) {
 		return fn(error, null);
 	}
