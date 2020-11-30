@@ -100,11 +100,28 @@ import rateLimiterMiddleware from "./core/rateLimiter";
 
 // Initialize Passport
 app.use(passport.initialize());
-app.use(passport.session());
+app.use((req, res, next) => {
+	if (req.url.match(/\/(?:serve|auth)/))
+		passport.authenticate("session", (err: any, user: any, info: any) => {
+			console.log("passport.authenticate('session')");
+			console.log(user);
+			console.log(err);
+
+			if (err) req.logOut();
+			if (!user) return res.redirect("/auth/login");
+
+			req.logIn(user, (err) => {
+				if (err) return next(err);
+				return next();
+			});
+		})(req, res, next);
+	else next();
+});
 
 app.use("/auth", routerAuth);
 app.use("/serve", [isAuthenticated, rateLimiterMiddleware, routerServe]);
 
+// Save requested file
 app.get("/:type", (req, res, next) => {
 	/**
 	 * @param {param} type => Homework type

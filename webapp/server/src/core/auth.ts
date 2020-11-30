@@ -15,11 +15,11 @@ passport.serializeUser((user: any, done: any) => {
 
 passport.deserializeUser(async (oid: any, done: any) => {
 	try {
-		await findByOid(oid, (err: any, user: any) => {
-			if (err) {
-				done(err, null);
+		await findByOid(oid, (error: any, user: any) => {
+			if (error) {
+				done(error, null);
 			} else {
-				done(err, user.dataValues);
+				done(null, user.dataValues);
 			}
 		});
 	} catch (error) {
@@ -92,13 +92,7 @@ passport.use(
 			}
 
 			await findByOid(profile.oid, async (err: any, user: any) => {
-				if (err) {
-					console.log("Error captured here");
-					console.log(profile);
-					console.log(user);
-					return done(err);
-				}
-				if (!user) {
+				if (err || !user) {
 					try {
 						const details: any = getIdByEmail(profile._json.email);
 						await User.create({
