@@ -93,6 +93,9 @@ passport.use(
 
 			await findByOid(profile.oid, async (err: any, user: any) => {
 				if (err) {
+					console.log("Error captured here");
+					console.log(profile);
+					console.log(user);
 					return done(err);
 				}
 				if (!user) {
@@ -122,7 +125,7 @@ router.get(
 	(req, res, next) => {
 		passport.authenticate("azuread-openidconnect", {
 			response: res,
-			failureRedirect: "/",
+			failureRedirect: "/auth/fail",
 		})(req, res, next);
 	},
 	(req, res) => {
