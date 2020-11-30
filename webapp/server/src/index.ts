@@ -21,7 +21,7 @@ app.set("views", path.join(__dirname, "views"));
 
 Sentry.init({
 	dsn:
-		"https://9181fb60ebab4c419131b3205792bfd4@o484380.ingest.sentry.io/5537393",
+		"https://5a5a7255b5a04d1fa2448350fa3ede5e@o484758.ingest.sentry.io/5538458",
 	integrations: [
 		new Sentry.Integrations.Http({ tracing: true }),
 		new Tracing.Integrations.Express({ app }),
