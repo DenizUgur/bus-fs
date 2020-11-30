@@ -28,32 +28,14 @@ router.get("/download", async (req, res) => {
 			res.download(
 				`../data/out/${req.user.sid}_${type}.xlsm`,
 				`${req.user.sid}_${type}.xlsm`,
-				(err) => {
-					if (err) {
-						console.error(err);
-						return res.render("error", {
-							title: "500 Error",
-							message: "500",
-							subtitle: "Internal Server Error",
-							description:
-								"Sorry to see you here, please report us what happend so that we can help you",
-							mail: true,
-						});
-					}
+				(error) => {
+					if (error) throw error;
 					fs.unlinkSync(`../data/out/${req.user.sid}_${type}.xlsm`);
 				}
 			);
 		})
 		.catch((error) => {
-			console.error(error);
-			return res.render("error", {
-				title: "500 Error",
-				message: "500",
-				subtitle: "Internal Server Error",
-				description:
-					"Sorry to see you here, please report us what happend so that we can help you",
-				mail: true,
-			});
+			throw error;
 		});
 });
 

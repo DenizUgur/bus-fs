@@ -21,15 +21,7 @@ const rateLimiterMiddleware = (req: any, res: any, next: any) => {
 		})
 		.catch((RLResponse) => {
 			if (RLResponse instanceof Error) {
-				console.error(RLResponse.message, RLResponse.stack);
-				return res.render("error", {
-					title: "500 Error",
-					message: "500",
-					subtitle: "Internal Server Error",
-					description:
-						"Sorry to see you here, please report us what happend so that we can help you",
-					mail: true,
-				});
+				throw RLResponse;
 			} else {
 				const seconds = (
 					parseFloat(RLResponse.toJSON().msBeforeNext) / 1000

@@ -8,6 +8,9 @@ import methodOverride from "method-override";
 import session from "express-session";
 import cookieParser from "cookie-parser";
 
+import * as Sentry from "@sentry/node";
+import * as Tracing from "@sentry/tracing";
+
 const PORT = process.env.PORT || 5000;
 
 // Express App
@@ -15,6 +18,19 @@ const app: express.Application = express();
 app.set("trust proxy", 1);
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "views"));
+
+Sentry.init({
+	dsn:
+		"https://9181fb60ebab4c419131b3205792bfd4@o484380.ingest.sentry.io/5537393",
+	integrations: [
+		new Sentry.Integrations.Http({ tracing: true }),
+		new Tracing.Integrations.Express({ app }),
+	],
+	tracesSampleRate: 1.0,
+});
+
+app.use(Sentry.Handlers.requestHandler());
+app.use(Sentry.Handlers.tracingHandler());
 app.use("/assets", express.static(path.join(__dirname, "assets")));
 
 app.use(
@@ -53,7 +69,7 @@ if (process.env.NODE_ENV == "production") {
 			store: new RedisStore({ client: redisClient, ttl: 1000 * 60 * 15 }),
 			secret: process.env.SESSION_KEY || "",
 			resave: false,
-			saveUninitialized: true,
+			saveUninitialized: false,
 			cookie: {
 				secure: true,
 				sameSite: "none",
@@ -65,9 +81,9 @@ if (process.env.NODE_ENV == "production") {
 		session({
 			secret: process.env.SESSION_KEY || "",
 			resave: false,
-			saveUninitialized: true,
+			saveUninitialized: false,
 			cookie: {
-				secure: true,
+				secure: false,
 				sameSite: "none",
 			},
 		})
@@ -108,14 +124,15 @@ app.get("/:type", (req, res, next) => {
 	});
 });
 
+app.use(Sentry.Handlers.errorHandler());
+
 app.use((err: any, req: any, res: any, next: any) => {
 	console.error(err);
 	return res.render("error", {
-		title: "500 Error",
+		title: "Error",
 		message: "500",
 		subtitle: "Internal Server Error",
-		description:
-			"Sorry to see you here, please report us what happend so that we can help you",
+		description: `Sorry to see you here, please report us what happend so that we can help you. Error ID: ${res.sentry}`,
 		mail: true,
 	});
 });
