@@ -15,6 +15,16 @@ router.get("/", (req, res) => {
 	});
 });
 
+router.post("/test", async (req, res) => {
+	await Stats.create({
+		ip: req.ip,
+		userAgent: req.headers["user-agent"],
+		type: req.session.type || "N/A",
+		origin: "POST",
+	});
+	res.status(200).end();
+});
+
 router.get("/download", async (req, res) => {
 	//TODO: Change fallback behavior
 	const type = req.session.type || "hw4";
@@ -22,6 +32,7 @@ router.get("/download", async (req, res) => {
 		ip: req.ip,
 		userAgent: req.headers["user-agent"],
 		type: req.session.type || "N/A",
+		origin: "GET",
 	});
 	exec_prom(`python3 ../worker/app.py ${type} ${req.user.sid || ""}`)
 		.then(() => {
