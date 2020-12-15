@@ -43,12 +43,12 @@ const getIdByEmail = (email: any) => {
 	const TA = listTA.find((el: any) => el.email === email);
 	const student = list.find((el: any) => el.email === email);
 	let details = {
-		ta: false,
+		level: 0,
 		sid: "",
 		enrolled: true,
 	};
 
-	if (TA) details.ta = true;
+	if (TA) details.level = 100;
 	if (TA || student) {
 		details.sid = (TA || student).id;
 	} else {
@@ -100,8 +100,8 @@ passport.use(
 							displayName: profile.displayName,
 							email: profile._json.email,
 							sid: details.sid,
-							ta: details.ta,
 							enrolled: details.enrolled,
+							level: details.level,
 						});
 						return done(null, profile);
 					} catch (error) {
@@ -114,44 +114,29 @@ passport.use(
 	)
 );
 
-router.get(
-	"/login",
-	(req, res, next) => {
-		passport.authenticate("azuread-openidconnect", {
-			response: res,
-			failureRedirect: "/auth/fail",
-		})(req, res, next);
-	},
-	(req, res) => {
-		res.redirect("/serve");
-	}
-);
+router.get("/login", (req, res, next) => {
+	passport.authenticate("azuread-openidconnect", {
+		response: res,
+		successReturnToOrRedirect: "/serve",
+		failureRedirect: "/auth/fail",
+	})(req, res, next);
+});
 
-router.get(
-	"/openid/return",
-	(req, res, next) => {
-		passport.authenticate("azuread-openidconnect", {
-			response: res,
-			failureRedirect: "/auth/fail",
-		})(req, res, next);
-	},
-	(req, res) => {
-		res.redirect("/serve");
-	}
-);
+router.get("/openid/return", (req, res, next) => {
+	passport.authenticate("azuread-openidconnect", {
+		response: res,
+		successReturnToOrRedirect: "/serve",
+		failureRedirect: "/auth/fail",
+	})(req, res, next);
+});
 
-router.post(
-	"/openid/return",
-	(req, res, next) => {
-		passport.authenticate("azuread-openidconnect", {
-			response: res,
-			failureRedirect: "/auth/fail",
-		})(req, res, next);
-	},
-	(req, res) => {
-		res.redirect("/serve");
-	}
-);
+router.post("/openid/return", (req, res, next) => {
+	passport.authenticate("azuread-openidconnect", {
+		response: res,
+		successReturnToOrRedirect: "/serve",
+		failureRedirect: "/auth/fail",
+	})(req, res, next);
+});
 
 router.get("/fail", (req, res) => {
 	res.render("error", {
@@ -171,6 +156,9 @@ router.get("/logout", (req, res) => {
 });
 
 const isAuthenticated = (req: Request, res: Response, next: any) => {
+	// Save returnTo
+	req.session.returnTo = req.originalUrl;
+
 	if (req.isAuthenticated()) {
 		if (req.user) {
 			if (req.user.enrolled) {
@@ -187,5 +175,25 @@ const isAuthenticated = (req: Request, res: Response, next: any) => {
 	}
 };
 
+const isTA = (req: Request, res: Response, next: any) => {
+	// Save returnTo
+	req.session.returnTo = req.originalUrl;
+
+	if (req.isAuthenticated()) {
+		if (req.user) {
+			if (req.user.level > 0) {
+				return next();
+			}
+		}
+		return res.render("index", {
+			title: "BUS File Service",
+			message: `Sorry, you are not allowed to access this page.`,
+			serve: false,
+		});
+	} else {
+		return res.redirect("/auth/login");
+	}
+};
+
 export default router;
-export { passport, isAuthenticated };
+export { passport, isAuthenticated, isTA};
