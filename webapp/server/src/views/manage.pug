@@ -1,0 +1,25 @@
+html
+    head
+        meta(http-equiv="Content-Type" content="text/html;charset=UTF-8")
+        meta(name="viewport" content="width=device-width, initial-scale=1")
+        meta(charset="utf-8")
+
+        title="TA Managment Panel"
+
+        //- Icon
+        link(rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon")
+
+    body
+        form(action="/manage/modify" method="POST" target="dummyframe")
+            p
+                label(for="student")="Student ID / E-Mail"
+                input(type="text" name="student" value="")
+                br
+                label(for="access")="Allow Access"
+                input(type="checkbox" name="access" checked=access)
+                br
+                label(for="macrofree")="MacroFree"
+                input(type="checkbox" name="macrofree")
+                br
+                input(type='submit' value='Submit')
+        iframe(width="0" height="0" border="0" name="dummyframe" id="dummyframe")

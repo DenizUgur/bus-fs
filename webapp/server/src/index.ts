@@ -95,13 +95,14 @@ if (process.env.NODE_ENV == "production") {
 //////////////////////////
 import sequelize from "./db";
 import routerServe from "./core/serve";
-import routerAuth, { passport, isAuthenticated } from "./core/auth";
+import routerManage from "./core/manage";
+import routerAuth, { passport, isAuthenticated, isTA } from "./core/auth";
 import rateLimiterMiddleware from "./core/rateLimiter";
 
 // Initialize Passport
 app.use(passport.initialize());
 app.use((req, res, next) => {
-	if (req.url.match(/\/(?:serve|auth)/))
+	if (req.url.match(/\/(?:auth|serve|manage)/))
 		passport.authenticate("session", (err: any, user: any, info: any) => {
 			if (err) req.logOut();
 			if (!user) return res.redirect("/auth/login");
@@ -116,6 +117,7 @@ app.use((req, res, next) => {
 
 app.use("/auth", routerAuth);
 app.use("/serve", [isAuthenticated, rateLimiterMiddleware, routerServe]);
+app.use("/manage", [isAuthenticated, isTA, routerManage]);
 
 // Save requested file
 app.get("/:type", (req, res, next) => {
@@ -123,7 +125,8 @@ app.get("/:type", (req, res, next) => {
 	 * @param {param} type => Homework type
 	 */
 	//* Save request to session before redirect
-	if (req.params.type != "hw4") {
+	//TODO: Make this dynamic
+	if (req.params.type != "hw5") {
 		return res.render("index", {
 			title: "BUS File Service",
 			message: "This homework is not available yet.",

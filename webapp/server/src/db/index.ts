@@ -53,11 +53,11 @@ const User = sequelize.define(
 		sid: {
 			type: DataTypes.STRING,
 		},
-		ta: {
-			type: DataTypes.BOOLEAN,
-		},
 		enrolled: {
 			type: DataTypes.BOOLEAN,
+		},
+		level: {
+			type: DataTypes.INTEGER,
 		},
 	},
 	{

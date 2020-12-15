@@ -27,7 +27,7 @@ router.post("/test", async (req, res) => {
 
 router.get("/download", async (req, res) => {
 	//TODO: Change fallback behavior
-	const type = req.session.type || "hw4";
+	const type = req.session.type || "hw5";
 	await Stats.create({
 		ip: req.ip,
 		userAgent: req.headers["user-agent"],
