@@ -94,7 +94,7 @@ if (process.env.NODE_ENV == "production") {
 //		APP START		//
 //////////////////////////
 import sequelize from "./db";
-import routerServe from "./core/serve";
+import routerServe, { isAvailable } from "./core/serve";
 import routerManage from "./core/manage";
 import routerAuth, { passport, isAuthenticated, isTA } from "./core/auth";
 import rateLimiterMiddleware from "./core/rateLimiter";
@@ -116,28 +116,33 @@ app.use((req, res, next) => {
 });
 
 app.use("/auth", routerAuth);
-app.use("/serve", [isAuthenticated, rateLimiterMiddleware, routerServe]);
 app.use("/manage", [isAuthenticated, isTA, routerManage]);
 
-// Save requested file
+if (process.env.NODE_ENV == "production") {
+	app.use("/serve", [isAuthenticated, rateLimiterMiddleware, routerServe]);
+} else {
+	app.use(
+		"/serve",
+		(req, res, next) => {
+			req.user = {
+				displayName: "Test User",
+				sid: "S000002",
+			};
+			next();
+		},
+		routerServe
+	);
+}
+
 app.get("/:type", (req, res, next) => {
-	/**
-	 * @param {param} type => Homework type
-	 */
-	//* Save request to session before redirect
-	//TODO: Make this dynamic
-	if (req.params.type != "hw5") {
+	if (!isAvailable(req.params.type)) {
 		return res.render("index", {
 			title: "BUS File Service",
 			message: "This homework is not available yet.",
 			serve: false,
 		});
 	}
-	req.session.type = req.params.type;
-	req.session.save((error: any) => {
-		if (error) return next(error);
-		return res.redirect("/serve");
-	});
+	return res.redirect(`/serve/${req.params.type}`);
 });
 
 app.use(Sentry.Handlers.errorHandler());
