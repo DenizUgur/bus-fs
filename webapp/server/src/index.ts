@@ -51,12 +51,15 @@ if (dev) {
 app.get("/:type", (req, res, next) => {
 	if (!isAvailable(req.params.type)) {
 		return res.render("index", {
-			title: "BUS File Service",
 			message: "This homework is not available yet.",
 			serve: false,
 		});
 	}
-	return res.redirect(`/serve/${req.params.type}`);
+	req.session.type = req.params.type;
+	return res.render("index", {
+		message: "Redirecting you to your homework.",
+		session: true,
+	});
 });
 
 app.use(Sentry.Handlers.errorHandler());

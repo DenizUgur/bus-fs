@@ -12,18 +12,8 @@ const isAvailable = (type: string) => {
 	return type == "hw5";
 };
 
-router.get("/:type", (req, res) => {
-	res.render("index", {
-		title: "BUS File Service",
-		message: `Hi ${req.user.displayName}, your file is currently being prepared. Please wait...`,
-		serve: true,
-	});
-});
-
 router.get("/", (req, res) => {
-	//TODO: Change fallback behavior
 	res.render("index", {
-		title: "BUS File Service",
 		message: `Hi ${req.user.displayName}, your file is currently being prepared. Please wait...`,
 		serve: true,
 	});
@@ -35,8 +25,7 @@ router.get("/download/:type", async (req, res) => {
 	await Stats.create({
 		ip: req.ip,
 		userAgent: req.headers["user-agent"],
-		type: req.params.type || "N/A",
-		origin: "GET",
+		type: req.session.type || "N/A",
 	});
 	if (isAvailable(type)) {
 		exec_prom(`python3 ../worker/app.py ${type} ${req.user.sid || ""}`)
@@ -57,7 +46,6 @@ router.get("/download/:type", async (req, res) => {
 			});
 	} else {
 		return res.render("index", {
-			title: "BUS File Service",
 			message: "This homework is not available yet.",
 			serve: false,
 		});

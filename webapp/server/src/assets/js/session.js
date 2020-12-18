@@ -1,5 +1,5 @@
 var callback = function () {
-	window.location = "/serve/download/hw5";
+	window.location = "/serve";
 };
 
 if (

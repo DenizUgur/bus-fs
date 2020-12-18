@@ -79,9 +79,6 @@ const Stats = sequelize.define(
 		userAgent: {
 			type: DataTypes.STRING,
 		},
-		origin: {
-			type: DataTypes.STRING,
-		},
 	},
 	{
 		freezeTableName: true,

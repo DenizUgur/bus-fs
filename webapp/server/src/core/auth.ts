@@ -166,7 +166,6 @@ const isAuthenticated = (req: Request, res: Response, next: any) => {
 			}
 		}
 		return res.render("index", {
-			title: "BUS File Service",
 			message: `Sorry, you are not enrolled to this course.`,
 			serve: false,
 		});
@@ -186,7 +185,6 @@ const isTA = (req: Request, res: Response, next: any) => {
 			}
 		}
 		return res.render("index", {
-			title: "BUS File Service",
 			message: `Sorry, you are not allowed to access this page.`,
 			serve: false,
 		});
