@@ -6,12 +6,16 @@ RUN apk add --no-cache --update python3 py3-pip bash \
     nodejs-current npm make gcc
 
 # Copy package files
-RUN mkdir -p /opt/webapp/server /opt/webapp/worker
+RUN mkdir -p /opt/webapp/server /opt/webapp/worker /opt/webapp/ui
 ADD ./webapp/server/package.json /opt/webapp/server
 ADD ./webapp/server/package-lock.json /opt/webapp/server
 
+ADD ./webapp/ui/package.json /opt/webapp/ui
+ADD ./webapp/ui/package-lock.json /opt/webapp/ui
+
 # Install dependencies
 RUN cd /opt/webapp/server && npm ci
+RUN cd /opt/webapp/ui && npm ci
 
 # Copy the application
 ADD ./webapp /opt/webapp
