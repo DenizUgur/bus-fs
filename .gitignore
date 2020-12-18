@@ -1,6 +1,8 @@
 node_modules/
 build/
 utils/
+webapp/data/out/
+webapp/data/tmp/
 .prettierrc
 .env
 nodemon.json

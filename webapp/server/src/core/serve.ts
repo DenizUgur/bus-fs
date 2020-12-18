@@ -20,6 +20,15 @@ router.get("/:type", (req, res) => {
 	});
 });
 
+router.get("/", (req, res) => {
+	//TODO: Change fallback behavior
+	res.render("index", {
+		title: "BUS File Service",
+		message: `Hi ${req.user.displayName}, your file is currently being prepared. Please wait...`,
+		serve: true,
+	});
+});
+
 router.get("/download/:type", async (req, res) => {
 	//TODO: Change fallback behavior
 	const type = "hw5";
