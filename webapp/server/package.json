@@ -7,7 +7,7 @@
 		"node": "12.x"
 	},
 	"scripts": {
-		"start": "npm run build && npm --prefix ../ui run build && node build/index.js",
+		"start": "node build/index.js",
 		"start:dev": "nodemon",
 		"build": "rimraf ./build && tsc && cp -r ./src/views ./build && cp -r ./src/assets ./build"
 	},
