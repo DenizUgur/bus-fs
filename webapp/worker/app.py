@@ -7,7 +7,9 @@ import zipfile
 if __name__ == "__main__":
     # Get request info
     temp_file = sys.argv[1]
-    student_id = sys.argv[2]
+    macrofree = int(sys.argv[2])
+    student_id = sys.argv[3]
+    extension = "xlsx" if macrofree == 1 else "xlsm"
 
     # Create /out folder if not exists
     if not os.path.exists("../data/out"):
@@ -22,37 +24,37 @@ if __name__ == "__main__":
         os.mkdir("../data/out/unzipped", 0o777)
 
     # If template hasn't been unzipped before, unzip it
-    if not os.path.exists("../data/out/unzipped/{}_template".format(temp_file)):
+    if not os.path.exists("../data/out/unzipped/{}_template_{}".format(temp_file, extension)):
         with zipfile.ZipFile(
-            "../data/templates/{}_template.xlsm".format(temp_file), "r"
+            "../data/templates/{}_template.{}".format(temp_file, extension), "r"
         ) as zip_ref:
-            zip_ref.extractall("../data/out/unzipped/{}_template".format(temp_file))
+            zip_ref.extractall("../data/out/unzipped/{}_template_{}".format(temp_file, extension))
 
     # Create temporary directory for new file
     shutil.copytree(
-        "../data/out/unzipped/{}_template".format(temp_file),
-        "../data/tmp/{}".format(student_id),
+        "../data/out/unzipped/{}_template_{}".format(temp_file, extension),
+        "../data/tmp/{}_{}".format(student_id, extension),
     )
 
     # Change Student ID
-    with open("../data/tmp/{}/xl/sharedStrings.xml".format(student_id), "r") as fp:
+    with open("../data/tmp/{}_{}/xl/sharedStrings.xml".format(student_id, extension), "r") as fp:
         raw = fp.read()
         raw = raw.replace("S000001", student_id)
 
-    with open("../data/tmp/{}/xl/sharedStrings.xml".format(student_id), "w") as fp:
+    with open("../data/tmp/{}_{}/xl/sharedStrings.xml".format(student_id, extension), "w") as fp:
         fp.write(raw)
 
     # Comprsess the folder and place it in /out
     with zipfile.ZipFile(
-        "../data/out/{}_{}.xlsm".format(student_id, temp_file),
+        "../data/out/{}_{}.{}".format(student_id, temp_file, extension),
         "w",
         zipfile.ZIP_DEFLATED,
     ) as zipobj:
-        rootlen = len("../data/tmp/{}".format(student_id)) + 1
-        for base, _, files in os.walk("../data/tmp/{}".format(student_id)):
+        rootlen = len("../data/tmp/{}_{}".format(student_id, extension)) + 1
+        for base, _, files in os.walk("../data/tmp/{}_{}".format(student_id, extension)):
             for file in files:
                 fn = os.path.join(base, file)
                 zipobj.write(fn, fn[rootlen:])
 
     # Remove temporary directory
-    shutil.rmtree("../data/tmp/{}".format(student_id))
+    shutil.rmtree("../data/tmp/{}_{}".format(student_id, extension))

@@ -17,17 +17,19 @@ app.set("trust proxy", 1);
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "../views"));
 
-Sentry.init({
-	dsn: process.env.SENTRY_DSN,
-	integrations: [
-		new Sentry.Integrations.Http({ tracing: true }),
-		new Tracing.Integrations.Express({ app }),
-	],
-	tracesSampleRate: 1.0,
-});
+if (!dev) {
+	Sentry.init({
+		dsn: process.env.SENTRY_DSN,
+		integrations: [
+			new Sentry.Integrations.Http({ tracing: true }),
+			new Tracing.Integrations.Express({ app }),
+		],
+		tracesSampleRate: 1.0,
+	});
+	app.use(Sentry.Handlers.requestHandler());
+	app.use(Sentry.Handlers.tracingHandler());
+}
 
-app.use(Sentry.Handlers.requestHandler());
-app.use(Sentry.Handlers.tracingHandler());
 app.use("/assets", express.static(path.join(__dirname, "../assets")));
 app.use("/", express.static(path.join(__dirname, "../../../ui/build/")));
 

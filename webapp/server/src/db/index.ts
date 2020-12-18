@@ -67,6 +67,58 @@ const User = sequelize.define(
 	}
 );
 
+const FileAccess = sequelize.define(
+	"file_access",
+	{
+		name: {
+			type: DataTypes.STRING,
+			primaryKey: true,
+		},
+		enabled: {
+			type: DataTypes.BOOLEAN,
+		},
+		onetime: {
+			type: DataTypes.BOOLEAN,
+			defaultValue: false,
+		},
+		level: {
+			type: DataTypes.INTEGER,
+		},
+	},
+	{
+		freezeTableName: true,
+		createdAt: false,
+		updatedAt: false,
+	}
+);
+
+const UserAccess = sequelize.define(
+	"user_access",
+	{
+		userOid: {
+			type: DataTypes.STRING,
+			primaryKey: true,
+		},
+		type: {
+			type: DataTypes.STRING,
+			primaryKey: true,
+		},
+		accessed: {
+			type: DataTypes.BOOLEAN,
+			defaultValue: true,
+		},
+		macrofree: {
+			type: DataTypes.BOOLEAN,
+			defaultValue: false,
+		},
+	},
+	{
+		freezeTableName: true,
+		createdAt: false,
+		updatedAt: false,
+	}
+);
+
 const Stats = sequelize.define(
 	"stats",
 	{
@@ -87,5 +139,9 @@ const Stats = sequelize.define(
 	}
 );
 
+//* Relations
+User.hasMany(UserAccess);
+UserAccess.belongsTo(User);
+
 export default sequelize;
-export { RateLimit, User, Stats };
+export { RateLimit, User, FileAccess, UserAccess, Stats };

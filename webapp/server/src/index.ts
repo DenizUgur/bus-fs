@@ -7,7 +7,7 @@ const dev = process.env.NODE_ENV !== "production";
 //		APP START		//
 //////////////////////////
 import sequelize from "./db";
-import routerServe, { isAvailable } from "./core/serve";
+import routerServe from "./core/serve";
 import routerManage from "./core/manage";
 import routerAuth, { passport, isAuthenticated, isTA } from "./core/auth";
 import rateLimiterMiddleware from "./core/rateLimiter";
@@ -36,8 +36,12 @@ if (dev) {
 		"/serve",
 		(req, res, next) => {
 			req.user = {
-				displayName: "Test User",
-				sid: "S000002",
+				displayName: "Deniz Ugur",
+				sid: "S014557",
+				oid: "test_oid",
+				email: "deniz.ugur@ozu.edu.tr",
+				enrolled: true,
+				level: 100,
 			};
 			next();
 		},
@@ -49,20 +53,14 @@ if (dev) {
 }
 
 app.get("/:type", (req, res, next) => {
-	if (!isAvailable(req.params.type)) {
-		return res.render("index", {
-			message: "This homework is not available yet.",
-			serve: false,
-		});
-	}
 	req.session.type = req.params.type;
 	return res.render("index", {
-		message: "Redirecting you to your homework.",
+		message: "Redirecting you to your assignment.",
 		session: true,
 	});
 });
 
-app.use(Sentry.Handlers.errorHandler());
+if (!dev) app.use(Sentry.Handlers.errorHandler());
 
 app.use((err: any, req: any, res: any, next: any) => {
 	console.error(err);
