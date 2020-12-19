@@ -6,7 +6,7 @@ const dev = process.env.NODE_ENV !== "production";
 //////////////////////////
 //		APP START		//
 //////////////////////////
-import sequelize from "./db";
+import sequelize, { FileAccess, User } from "./db";
 import routerServe from "./core/serve";
 import routerManage from "./core/manage";
 import routerAuth, { passport, isAuthenticated, isTA } from "./core/auth";
@@ -75,6 +75,33 @@ app.use((err: any, req: any, res: any, next: any) => {
 
 const PORT = process.env.PORT || 5000;
 
-sequelize.sync({ force: process.env.NODE_ENV != "production" }).then(() => {
-	app.listen(PORT, () => console.log(`Listening on ${PORT}`));
-});
+sequelize
+	.sync({ force: process.env.NODE_ENV != "production" })
+	.then(async () => {
+		if (dev) {
+			// Create seed data
+			await FileAccess.bulkCreate([
+				{
+					name: "hw5",
+					enabled: true,
+					onetime: false,
+					level: 0,
+				},
+				{
+					name: "mt2",
+					enabled: true,
+					onetime: true,
+					level: 100,
+				},
+			]);
+			await User.create({
+				oid: "test_oid",
+				displayName: "Deniz Ugur",
+				email: "deniz.ugur@ozu.edu.tr",
+				sid: "S014557",
+				enrolled: true,
+				level: 100,
+			});
+		}
+		app.listen(PORT, () => console.log(`Listening on ${PORT}`));
+	});

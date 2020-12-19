@@ -50,7 +50,7 @@ const getIdByEmail = (email: any) => {
 
 	if (TA) details.level = 100;
 	if (TA || student) {
-		details.sid = (TA || student).id;
+		details.sid = (TA || student).sid;
 	} else {
 		details.enrolled = false;
 	}

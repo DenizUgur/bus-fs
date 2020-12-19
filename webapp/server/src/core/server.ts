@@ -53,7 +53,7 @@ app.use(
 );
 app.use(
 	cors({
-		origin: "https://bus-fs.herokuapp.com/",
+		origin: dev ? "*" : "https://bus-fs.herokuapp.com/",
 		credentials: true,
 		allowedHeaders: "Content-Type, Set-Cookie, Authorization",
 	})
