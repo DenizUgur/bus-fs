@@ -48,7 +48,7 @@ const getIdByEmail = (email: any) => {
 		enrolled: true,
 	};
 
-	if (TA) details.level = 100;
+	if (TA) details.level = TA.level;
 	if (TA || student) {
 		details.sid = (TA || student).sid;
 	} else {
@@ -174,13 +174,13 @@ const isAuthenticated = (req: Request, res: Response, next: any) => {
 	}
 };
 
-const isTA = (req: Request, res: Response, next: any) => {
+const isSeniorTA = (req: Request, res: Response, next: any) => {
 	// Save returnTo
 	req.session.returnTo = req.originalUrl;
 
 	if (req.isAuthenticated()) {
 		if (req.user) {
-			if (req.user.level > 0) {
+			if (req.user.level > 100) {
 				return next();
 			}
 		}
@@ -194,4 +194,4 @@ const isTA = (req: Request, res: Response, next: any) => {
 };
 
 export default router;
-export { passport, isAuthenticated, isTA};
+export { passport, isAuthenticated, isSeniorTA};

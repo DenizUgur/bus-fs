@@ -9,7 +9,7 @@ const dev = process.env.NODE_ENV !== "production";
 import sequelize, { FileAccess, User } from "./db";
 import routerServe from "./core/serve";
 import routerManage from "./core/manage";
-import routerAuth, { passport, isAuthenticated, isTA } from "./core/auth";
+import routerAuth, { passport, isAuthenticated, isSeniorTA } from "./core/auth";
 import rateLimiterMiddleware from "./core/rateLimiter";
 
 // Initialize Passport
@@ -48,7 +48,7 @@ if (dev) {
 		routerServe
 	);
 } else {
-	app.use("/manage", [isAuthenticated, isTA, routerManage]);
+	app.use("/manage", [isAuthenticated, isSeniorTA, routerManage]);
 	app.use("/serve", [isAuthenticated, rateLimiterMiddleware, routerServe]);
 }
 
