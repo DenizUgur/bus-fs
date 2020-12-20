@@ -45,6 +45,12 @@ function App() {
 			}).then(async (data) => {
 				if (data.status === 200) {
 					const json = await data.json();
+					let password: any =
+						(parseInt(json.sid.split("S")[1]) * 48271) %
+						(Math.pow(2, 31) - 1);
+					password = password.toString();
+					password = parseInt(password.substr(password.length - 5));
+					json.password = password;
 					setStudent({
 						loaded: true,
 						...json,
@@ -115,6 +121,7 @@ function App() {
 					{student && student.loaded ? (
 						<Box className="StudentInfo">
 							<h1>{student.displayName}</h1>
+							<p>Password: {student.password}</p>
 						</Box>
 					) : (
 						<h2>
