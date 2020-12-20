@@ -88,7 +88,7 @@ router.get("/download/:type", async (req, res) => {
 	}
 
 	if (access?.macrofree) {
-		exec_prom(`python3 ../worker/app.py ${type} 1 ${req.user.sid}`)
+		exec_prom(`python3 ../worker/app.py ${type} 1 0 ${req.user.sid}`)
 			.then(() => {
 				res.download(
 					`../data/out/${req.user.sid}_${type}.xlsx`,
@@ -111,7 +111,8 @@ router.get("/download/:type", async (req, res) => {
 				throw error;
 			});
 	} else {
-		exec_prom(`python3 ../worker/app.py ${type} 0 ${req.user.sid}`)
+		let encrypt = type === "mt2" ? 1 : 0;
+		exec_prom(`python3 ../worker/app.py ${type} 0 ${encrypt} ${req.user.sid}`)
 			.then(() => {
 				res.download(
 					`../data/out/${req.user.sid}_${type}.xlsm`,

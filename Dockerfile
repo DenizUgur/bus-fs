@@ -1,27 +1,32 @@
 # Grab the latest alpine image
-FROM alpine:latest
+FROM ubuntu:20.10
 
 # Install python, pip & node, npm
-RUN apk add --no-cache --update python3 py3-pip bash \
-    nodejs-current npm make gcc
-
-# Copy package files
-RUN mkdir -p /opt/webapp/server /opt/webapp/worker /opt/webapp/ui
-ADD ./webapp/server/package.json /opt/webapp/server
-ADD ./webapp/server/package-lock.json /opt/webapp/server
-
-ADD ./webapp/ui/package.json /opt/webapp/ui
-ADD ./webapp/ui/package-lock.json /opt/webapp/ui
-
-# Install dependencies
-RUN cd /opt/webapp/server && npm ci
-RUN cd /opt/webapp/ui && npm ci
+RUN apt-get update && \
+    apt-get install -y curl && \
+    curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
+    apt-get install -y \
+    make gcc g++ git libssl-dev \
+    python3 python3-pip nodejs && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy the application
 ADD ./webapp /opt/webapp
-WORKDIR /opt/webapp
+
+# Install dependencies
+RUN cd /opt/webapp/server && npm ci && npm run build
+RUN cd /opt/webapp/ui && npm ci && npm run build
 
 # Run the image as a non-root user
-RUN adduser -D node
+RUN adduser node
+RUN mkdir -p /opt/encryptor
+RUN chown node:node /opt/encryptor
 USER node
+
+# Build Excel Encryptor
+RUN cd /opt/encryptor && \
+    git clone https://github.com/herumi/cybozulib && \
+    git clone https://github.com/herumi/msoffice
+
 ENV NODE_ENV="production"
+WORKDIR /opt/webapp
