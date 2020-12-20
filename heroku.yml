@@ -2,4 +2,4 @@ build:
   docker:
     web: Dockerfile
 run:
-  web: npm run --prefix /opt/webapp/server start
+  web: ./opt/webapp/start.sh
