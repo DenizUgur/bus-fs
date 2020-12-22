@@ -8,9 +8,10 @@ import subprocess
 if __name__ == "__main__":
     # Get request info
     temp_file = sys.argv[1]
-    extension = "xlsx" if int(sys.argv[2]) == 1 else "xlsm"
-    encrypt = True if int(sys.argv[3]) == 1 else False
-    student_id = sys.argv[4]
+    student_id = sys.argv[2]
+    extension = sys.argv[3]
+    encrypt = True if int(sys.argv[4]) == 1 else False
+    password = sys.argv[5] if len(sys.argv) == 6 else ""
 
     # Create /out folder if not exists
     if not os.path.exists("../data/out"):
@@ -72,12 +73,12 @@ if __name__ == "__main__":
 
     if encrypt:
         # Encrypt the file
-        out = subprocess.check_output(
+        subprocess.check_output(
             [
                 "/opt/encryptor/msoffice/bin/msoffice-crypt.exe",
                 "-e",
                 "-p",
-                "ninenine",
+                password,
                 os.path.abspath(
                     "../data/out/{}_{}.{}".format(student_id, temp_file, extension)
                 ),

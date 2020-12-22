@@ -84,6 +84,14 @@ const FileAccess = sequelize.define(
 		level: {
 			type: DataTypes.INTEGER,
 		},
+		encrypt: {
+			type: DataTypes.BOOLEAN,
+			defaultValue: false,
+		},
+		password: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
 	},
 	{
 		freezeTableName: true,
@@ -110,6 +118,10 @@ const UserAccess = sequelize.define(
 		macrofree: {
 			type: DataTypes.BOOLEAN,
 			defaultValue: false,
+		},
+		encrypt: {
+			type: DataTypes.BOOLEAN,
+			defaultValue: true,
 		},
 	},
 	{

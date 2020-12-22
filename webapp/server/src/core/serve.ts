@@ -87,54 +87,40 @@ router.get("/download/:type", async (req, res) => {
 		});
 	}
 
-	if (access?.macrofree) {
-		exec_prom(`python3 ../worker/app.py ${type} 1 0 ${req.user.sid}`)
-			.then(() => {
-				res.download(
-					`../data/out/${req.user.sid}_${type}.xlsx`,
-					`${req.user.sid}_${type}.xlsx`,
-					async (error) => {
-						if (error) throw error;
+	//* Decide preferences
+	const encrypt = file.encrypt && !(access && !access.encrypt);
+	const extension = access?.macrofree ? "xlsx" : "xlsm";
 
-						await UserAccess.upsert({
-							accessed: true,
-							type: type,
-							userOid: user.dataValues.oid,
-						});
-						fs.unlinkSync(
-							`../data/out/${req.user.sid}_${type}.xlsx`
-						);
-					}
-				);
-			})
-			.catch((error) => {
-				throw error;
-			});
-	} else {
-		let encrypt = type === "mt2" ? 1 : 0;
-		exec_prom(`python3 ../worker/app.py ${type} 0 ${encrypt} ${req.user.sid}`)
-			.then(() => {
-				res.download(
-					`../data/out/${req.user.sid}_${type}.xlsm`,
-					`${req.user.sid}_${type}.xlsm`,
-					async (error) => {
-						if (error) throw error;
+	exec_prom(
+		`python3 ../worker/app.py ${[
+			type,
+			req.user.sid,
+			extension,
+			encrypt ? 1 : 0,
+			file.password,
+		].join(" ")}`
+	)
+		.then(() => {
+			res.download(
+				`../data/out/${req.user.sid}_${type}.${extension}`,
+				`${req.user.sid}_${type}.${extension}`,
+				async (error) => {
+					if (error) throw error;
 
-						await UserAccess.upsert({
-							accessed: true,
-							type: type,
-							userOid: user.dataValues.oid,
-						});
-						fs.unlinkSync(
-							`../data/out/${req.user.sid}_${type}.xlsm`
-						);
-					}
-				);
-			})
-			.catch((error) => {
-				throw error;
-			});
-	}
+					await UserAccess.upsert({
+						accessed: true,
+						type: type,
+						userOid: user.dataValues.oid,
+					});
+					fs.unlinkSync(
+						`../data/out/${req.user.sid}_${type}.${extension}`
+					);
+				}
+			);
+		})
+		.catch((error) => {
+			throw error;
+		});
 });
 
 export default router;

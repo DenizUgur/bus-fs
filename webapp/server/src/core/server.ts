@@ -1,7 +1,6 @@
 import express from "express";
 import helmet from "helmet";
 import cors from "cors";
-import bodyParser from "body-parser";
 import path from "path";
 import redis from "redis";
 import methodOverride from "method-override";
@@ -58,7 +57,7 @@ app.use(
 		allowedHeaders: "Content-Type, Set-Cookie, Authorization",
 	})
 );
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride());
 app.use(cookieParser());
 
