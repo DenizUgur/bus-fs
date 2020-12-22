@@ -1,4 +1,5 @@
 import express, { Router } from "express";
+import util from "util";
 import { exec } from "child_process";
 import path from "path";
 import { FileAccess, User, UserAccess } from "../db";
@@ -26,8 +27,12 @@ router.get("/compile", async (req, res) => {
 		.then(() => {
 			console.log("Compiling");
 			try {
-				exec("cd /opt/encryptor/msoffice && make -j RELEASE=1");
-				console.log("Done compiling");
+				const exec_prom = util.promisify(exec);
+				exec_prom(
+					"cd /opt/encryptor/msoffice && make -j RELEASE=1"
+				).then(() => {
+					console.log("Done compiling");
+				});
 			} catch (error) {
 				console.log(error);
 			}
