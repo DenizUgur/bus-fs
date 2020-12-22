@@ -1,15 +1,20 @@
 import {
 	Box,
-	Card,
 	Checkbox,
 	Container,
+	FormControl,
+	FormControlLabel,
+	InputLabel,
+	MenuItem,
 	Paper,
+	Select,
 	Snackbar,
 	TextField,
 } from "@material-ui/core";
 import { Alert, Autocomplete } from "@material-ui/lab";
 import React, { useEffect, useState } from "react";
 import "./App.css";
+import { DebouncedTextField } from "./DebouncedTextField";
 
 const dev = process.env.NODE_ENV !== "production";
 const host = dev ? "http://localhost:5000" : "https://bus-fs.herokuapp.com";
@@ -18,7 +23,7 @@ function App() {
 	//* States
 	const [meta, setMeta] = useState<any>();
 	const [student, setStudent] = useState<any>();
-	const [type, setType] = useState<any>("mt2");
+	const [type, setType] = useState<any>("None");
 	const [snackbar, setSnackbar] = useState<any>({
 		message: "",
 		open: false,
@@ -113,10 +118,19 @@ function App() {
 	const modifyAccess = (options: any) => {
 		let newAccesses = Object.assign([], student.accesses);
 		const index = newAccesses.findIndex((e: any) => e.type === type);
-		newAccesses[index] = {
-			...newAccesses[index],
-			...options,
-		};
+		if (index === -1) {
+			newAccesses.push({
+				userOid: student.oid,
+				type: type,
+				...options,
+			});
+		} else {
+			newAccesses[index] = {
+				...newAccesses[index],
+				...options,
+			};
+		}
+
 		let newStudent = {
 			...student,
 			accesses: [...newAccesses],
@@ -155,8 +169,6 @@ function App() {
 	};
 
 	//* Render
-	//TODO: Finish UI
-	//TODO: At least add change for type
 	return (
 		<div className="App">
 			<Container>
@@ -174,7 +186,6 @@ function App() {
 					)}
 					{meta && (
 						<Autocomplete
-							id="combo-box-demo"
 							options={meta.list}
 							getOptionLabel={(option: any) =>
 								option.sid + " - " + option.email
@@ -187,7 +198,7 @@ function App() {
 									variant="outlined"
 								/>
 							)}
-							renderOption={(option, { selected }) => (
+							renderOption={(option) => (
 								<>
 									{option.sid}
 									<br />
@@ -201,39 +212,230 @@ function App() {
 					)}
 					{student && student.loaded && (
 						<Box className="Controls">
-							<Card>
-								<h2>Enable File</h2>
-								<Checkbox
-									onChange={(e) =>
-										modifyMeta({
-											enabled: e.target.checked,
-										})
-									}
-									checked={getMeta().enabled || false}
-								/>
-							</Card>
-							<Card>
-								<h2>Access Control</h2>
-								<Checkbox
-									onChange={(e) =>
-										modifyAccess({
-											accessed: e.target.checked,
-										})
-									}
-									checked={getAccess().accessed || false}
-								/>
-							</Card>
-							<Card>
-								<h2>MacroFree</h2>
-								<Checkbox
-									onChange={(e) =>
-										modifyAccess({
-											macrofree: e.target.checked,
-										})
-									}
-									checked={getAccess().macrofree || false}
-								/>
-							</Card>
+							<Paper className="ControlPaper">
+								<h2>File Control</h2>
+								<FormControl>
+									<InputLabel htmlFor="select-type">
+										File type
+									</InputLabel>
+									<Select
+										value={type}
+										onChange={(e) =>
+											setType(e.target.value)
+										}
+									>
+										<MenuItem value="None">None</MenuItem>
+										{meta.files.map((file: any) => {
+											return (
+												<MenuItem
+													value={file.name}
+													key={file.name}
+												>
+													{file.name.toUpperCase()}
+												</MenuItem>
+											);
+										})}
+									</Select>
+									{type && type !== "None" && (
+										<>
+											<FormControlLabel
+												control={
+													<Checkbox
+														onChange={(e) =>
+															modifyMeta({
+																enabled:
+																	e.target
+																		.checked,
+															})
+														}
+														checked={
+															getMeta().enabled ||
+															false
+														}
+													/>
+												}
+												label={`File is ${
+													getMeta().enabled
+														? "enabled"
+														: "disabled"
+												}`}
+											/>
+											<FormControlLabel
+												control={
+													<Checkbox
+														onChange={(e) =>
+															modifyMeta({
+																onetime:
+																	e.target
+																		.checked,
+															})
+														}
+														checked={
+															getMeta().onetime ||
+															false
+														}
+													/>
+												}
+												label={`File can be downloaded ${
+													getMeta().onetime
+														? "only one time"
+														: "without a limit"
+												}`}
+											/>
+											<FormControlLabel
+												control={
+													<Checkbox
+														onChange={(e) =>
+															modifyMeta({
+																encrypt:
+																	e.target
+																		.checked,
+															})
+														}
+														checked={
+															getMeta().encrypt ||
+															false
+														}
+													/>
+												}
+												label={`File is ${
+													getMeta().encrypt
+														? "encrypted"
+														: "not encrypted"
+												}`}
+											/>
+											<div className="Inputs">
+												<DebouncedTextField
+													label="Access Level"
+													value={getMeta().level || 0}
+													onChange={(payload: any) =>
+														modifyMeta({
+															level: payload,
+														})
+													}
+													helperText="Only students with the specified level and above will be able to access the file"
+												/>
+												{getMeta().encrypt && (
+													<DebouncedTextField
+														label="Password"
+														value={
+															getMeta()
+																.password || ""
+														}
+														onChange={(
+															payload: any
+														) =>
+															modifyMeta({
+																password: payload,
+															})
+														}
+														helperText="Password to open encrypted files"
+													/>
+												)}
+											</div>
+										</>
+									)}
+								</FormControl>
+							</Paper>
+							<Paper className="ControlPaper">
+								<h2>User Access</h2>
+								<FormControl>
+									<InputLabel htmlFor="select-type">
+										File type
+									</InputLabel>
+									<Select
+										value={type}
+										onChange={(e) =>
+											setType(e.target.value)
+										}
+									>
+										<MenuItem value="None">None</MenuItem>
+										{meta.files.map((file: any) => {
+											return (
+												<MenuItem
+													value={file.name}
+													key={file.name}
+												>
+													{file.name.toUpperCase()}
+												</MenuItem>
+											);
+										})}
+									</Select>
+									{type && type !== "None" && (
+										<>
+											<FormControlLabel
+												control={
+													<Checkbox
+														onChange={(e) =>
+															modifyAccess({
+																accessed:
+																	e.target
+																		.checked,
+															})
+														}
+														checked={
+															getAccess()
+																.accessed ||
+															false
+														}
+													/>
+												}
+												label={`User has ${
+													getAccess().accessed
+														? "accessed"
+														: "not accessed"
+												} the file`}
+											/>
+											<FormControlLabel
+												control={
+													<Checkbox
+														onChange={(e) =>
+															modifyAccess({
+																macrofree:
+																	e.target
+																		.checked,
+															})
+														}
+														checked={
+															getAccess()
+																.macrofree ||
+															false
+														}
+													/>
+												}
+												label={`User's file will be ${
+													getAccess().macrofree
+														? "MacroFree"
+														: "Macro-enabled"
+												}`}
+											/>
+											<FormControlLabel
+												control={
+													<Checkbox
+														onChange={(e) =>
+															modifyAccess({
+																encrypt:
+																	e.target
+																		.checked,
+															})
+														}
+														checked={
+															getAccess()
+																.encrypt ||
+															false
+														}
+													/>
+												}
+												label={`User's file will ${
+													getAccess().encrypt
+														? ""
+														: "not"
+												} obey encryption protocol`}
+											/>
+										</>
+									)}
+								</FormControl>
+							</Paper>
 						</Box>
 					)}
 				</Paper>
