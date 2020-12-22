@@ -92,6 +92,8 @@ sequelize
 					enabled: true,
 					onetime: true,
 					level: 100,
+					encrypt: true,
+					password: "NINENINE",
 				},
 			]);
 			await User.create({

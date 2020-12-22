@@ -2,4 +2,4 @@ build:
   docker:
     web: Dockerfile
 run:
-  web: cd /opt/encryptor/msoffice && make -j RELEASE=1 && npm run --prefix /opt/webapp/server start
+  web: npm run --prefix /opt/webapp/server start
