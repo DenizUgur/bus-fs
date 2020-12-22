@@ -8,6 +8,7 @@
 	},
 	"scripts": {
 		"start": "node build/index.js",
+		"start:build": "npm run build && node -r dotenv/config build/index.js",
 		"start:dev": "nodemon",
 		"build": "rimraf ./build && tsc && cp -r ./src/views ./build && cp -r ./src/assets ./build"
 	},
@@ -25,7 +26,6 @@
 		"@types/method-override": "0.0.31",
 		"@types/passport-azure-ad": "^4.0.7",
 		"@types/redis": "^2.8.28",
-		"body-parser": "^1.19.0",
 		"connect-redis": "^5.0.0",
 		"cookie-parser": "^1.4.5",
 		"cors": "^2.8.5",
@@ -45,6 +45,7 @@
 		"typescript": "^4.0.5"
 	},
 	"devDependencies": {
+		"dotenv": "^8.2.0",
 		"foreman": "^3.0.1",
 		"nodemon": "^2.0.6"
 	}

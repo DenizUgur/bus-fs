@@ -1,3 +1,4 @@
+import express from "express";
 import { Router } from "express";
 import path from "path";
 import { FileAccess, User, UserAccess } from "../db";
@@ -6,29 +7,27 @@ const router = Router();
 
 const list = require("../../../data/users/students.json");
 const listTA = require("../../../data/users/TAs.json");
-
 const uiRoot = path.join(__dirname, "../../../ui/build/");
+
+router.use(express.json());
 
 router.get("/", (req, res) => {
 	return res.sendFile(path.join(uiRoot, "index.html"));
 });
 
-router.post("/modify/access", async (req, res) => {
-	const user_accesses = await UserAccess.findAll({
-		where: {
-			userOid: req.body.oid,
-		},
-	});
-	if (user_accesses) {
-		user_accesses.forEach(async (access) => {
-			await access.update({
-				accessed: req.body.access === "true",
-				macrofree: req.body.macrofree === "true",
+router.post("/modify/:type", async (req, res) => {
+	try {
+		if (req.params.type === "file") {
+			await FileAccess.upsert(req.body);
+		} else if (req.params.type === "access") {
+			req.body.accesses.forEach(async (access: any) => {
+				await UserAccess.upsert(access);
 			});
-		});
-		return res.status(200).end();
+		} else throw new Error();
+		return res.sendStatus(200);
+	} catch (error) {
+		return res.sendStatus(500);
 	}
-	return res.status(500).end();
 });
 
 router.post("/meta/:type", async (req, res) => {
@@ -39,6 +38,12 @@ router.post("/meta/:type", async (req, res) => {
 			},
 			include: [UserAccess],
 		});
+
+		let password: any =
+			(parseInt(user.sid.split("S")[1]) * 48271) % (Math.pow(2, 31) - 1);
+		password = password.toString();
+		password = parseInt(password.substr(password.length - 5));
+
 		if (user) {
 			return res.json({
 				oid: user.oid,
@@ -47,6 +52,7 @@ router.post("/meta/:type", async (req, res) => {
 				displayName: user.displayName,
 				level: user.level,
 				accesses: user.user_accesses,
+				password: password,
 			});
 		}
 		return res.status(500).end();

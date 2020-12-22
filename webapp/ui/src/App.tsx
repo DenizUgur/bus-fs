@@ -1,15 +1,14 @@
 import {
 	Box,
-	Button,
 	Card,
 	Checkbox,
 	Container,
 	Paper,
+	Snackbar,
 	TextField,
 } from "@material-ui/core";
-import { Autocomplete } from "@material-ui/lab";
+import { Alert, Autocomplete } from "@material-ui/lab";
 import React, { useEffect, useState } from "react";
-import qs from "querystring";
 import "./App.css";
 
 const dev = process.env.NODE_ENV !== "production";
@@ -19,8 +18,12 @@ function App() {
 	//* States
 	const [meta, setMeta] = useState<any>();
 	const [student, setStudent] = useState<any>();
-	const [access, setAccess] = useState(true);
-	const [MacroFree, setMacroFree] = useState(false);
+	const [type, setType] = useState<any>("hw5");
+	const [snackbar, setSnackbar] = useState<any>({
+		message: "",
+		open: false,
+		severity: "success",
+	});
 
 	//* Initialization
 	useEffect(() => {
@@ -30,6 +33,11 @@ function App() {
 			.then((res) => res.json())
 			.then((data) => {
 				setMeta(data);
+				setSnackbar({
+					message: "Student metadata received",
+					open: true,
+					severity: "success",
+				});
 			});
 		return () => {};
 	}, []);
@@ -39,30 +47,27 @@ function App() {
 			fetch(host + "/manage/meta/student", {
 				method: "POST",
 				headers: {
-					"Content-Type": "application/x-www-form-urlencoded",
+					"Content-Type": "application/json",
 				},
-				body: qs.stringify({ email: student.email }),
+				body: JSON.stringify({ email: student.email }),
 			}).then(async (data) => {
 				if (data.status === 200) {
 					const json = await data.json();
-					let password: any =
-						(parseInt(json.sid.split("S")[1]) * 48271) %
-						(Math.pow(2, 31) - 1);
-					password = password.toString();
-					password = parseInt(password.substr(password.length - 5));
-					json.password = password;
 					setStudent({
 						loaded: true,
 						...json,
 					});
-					if (json.accesses.length > 0) {
-						setAccess(true);
-						let state = false;
-						json.accesses.forEach((el: any) => {
-							if (el.macrofree) state = true;
-						});
-						setMacroFree(state);
-					}
+					setSnackbar({
+						message: `${json.displayName} data gathered`,
+						open: true,
+						severity: "success",
+					});
+				} else {
+					setSnackbar({
+						message: `Student data couldn't be gathered`,
+						open: true,
+						severity: "error",
+					});
 				}
 			});
 		}
@@ -70,50 +75,87 @@ function App() {
 	}, [student]);
 
 	//* Handlers
-	const handleAccess = (event: any) => {
-		setAccess(false);
-		fetch(host + "/manage/modify/access", {
+	const getMeta = () => meta.files.find((e: any) => e.name === type) || {};
+	const modifyMeta = (options: any) => {
+		let newMeta = Object.assign({}, meta);
+		const index = newMeta.files.findIndex((e: any) => e.name === type);
+		let newFile = (newMeta.files[index] = {
+			...newMeta.files[index],
+			...options,
+		});
+		setMeta(newMeta);
+
+		fetch(host + "/manage/modify/file", {
 			method: "POST",
 			headers: {
-				"Content-Type": "application/x-www-form-urlencoded",
+				"Content-Type": "application/json",
 			},
-			body: qs.stringify({
-				oid: student.oid,
-				access: false,
-				macrofree: MacroFree,
-			}),
-		}).then(async (data) => {
+			body: JSON.stringify(newFile),
+		}).then((data) => {
 			if (data.status === 200) {
-				alert("Done");
+				setSnackbar({
+					message: `${newFile.name.toUpperCase()}'s details has been changed`,
+					open: true,
+					severity: "success",
+				});
 			} else {
-				alert("Error occured");
+				setSnackbar({
+					message: `${newFile.name.toUpperCase()}'s details couldn't be changed`,
+					open: true,
+					severity: "error",
+				});
 			}
 		});
 	};
 
-	const handleMacroFree = (event: any) => {
-		setMacroFree(event.target.checked);
-		setAccess(false);
+	const getAccess = () =>
+		student.accesses.find((e: any) => e.type === type) || {};
+	const modifyAccess = (options: any) => {
+		let newAccesses = Object.assign([], student.accesses);
+		const index = newAccesses.findIndex((e: any) => e.type === type);
+		newAccesses[index] = {
+			...newAccesses[index],
+			...options,
+		};
+		let newStudent = {
+			...student,
+			accesses: [...newAccesses],
+		};
+		setStudent(newStudent);
+
 		fetch(host + "/manage/modify/access", {
 			method: "POST",
 			headers: {
-				"Content-Type": "application/x-www-form-urlencoded",
+				"Content-Type": "application/json",
 			},
-			body: qs.stringify({
-				oid: student.oid,
-				access: false,
-				macrofree: event.target.checked,
-			}),
+			body: JSON.stringify(newStudent),
 		}).then(async (data) => {
 			if (data.status === 200) {
-				alert("Done");
+				setSnackbar({
+					message: `${student.displayName}'s file access data has been changed`,
+					open: true,
+					severity: "success",
+				});
 			} else {
-				alert("Error occured");
+				setSnackbar({
+					message: `${student.displayName}'s file access data couldn't be changed`,
+					open: true,
+					severity: "error",
+				});
 			}
+		});
+	};
+
+	//* Snackbar
+	const handleClose = () => {
+		setSnackbar({
+			...snackbar,
+			open: false,
 		});
 	};
 
 	//* Render
+	//TODO: Finish UI
 	return (
 		<div className="App">
 			<Container>
@@ -159,28 +201,40 @@ function App() {
 					{student && student.loaded && (
 						<Box className="Controls">
 							<Card>
-								<h2>Access Control</h2>
-								{student.accesses.length !== 0 && access ? (
-									<Button onClick={handleAccess}>
-										Submit
-									</Button>
-								) : (
-									<p>
-										Student haven't accessed the system yet
-									</p>
-								)}
+								<h2>Enable File</h2>
+								<Checkbox
+									onChange={(e) =>
+										modifyMeta({
+											enabled: e.target.checked,
+										})
+									}
+									checked={getMeta().enabled || false}
+								/>
 							</Card>
 							<Card>
-								<h2>MacroFree</h2>
+								<h2>Access Control</h2>
 								<Checkbox
-									onChange={handleMacroFree}
-									checked={MacroFree}
+									onChange={(e) =>
+										modifyAccess({
+											accessed: e.target.checked,
+										})
+									}
+									checked={getAccess().accessed || false}
 								/>
 							</Card>
 						</Box>
 					)}
 				</Paper>
 			</Container>
+			<Snackbar
+				open={snackbar.open}
+				autoHideDuration={4000}
+				onClose={handleClose}
+			>
+				<Alert onClose={handleClose} severity={snackbar.severity}>
+					{snackbar.message}
+				</Alert>
+			</Snackbar>
 		</div>
 	);
 }
