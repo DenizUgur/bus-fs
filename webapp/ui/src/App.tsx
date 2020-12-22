@@ -18,7 +18,7 @@ function App() {
 	//* States
 	const [meta, setMeta] = useState<any>();
 	const [student, setStudent] = useState<any>();
-	const [type, setType] = useState<any>("hw5");
+	const [type, setType] = useState<any>("mt2");
 	const [snackbar, setSnackbar] = useState<any>({
 		message: "",
 		open: false,
@@ -156,6 +156,7 @@ function App() {
 
 	//* Render
 	//TODO: Finish UI
+	//TODO: At least add change for type
 	return (
 		<div className="App">
 			<Container>
@@ -220,6 +221,17 @@ function App() {
 										})
 									}
 									checked={getAccess().accessed || false}
+								/>
+							</Card>
+							<Card>
+								<h2>MacroFree</h2>
+								<Checkbox
+									onChange={(e) =>
+										modifyAccess({
+											macrofree: e.target.checked,
+										})
+									}
+									checked={getAccess().macrofree || false}
 								/>
 							</Card>
 						</Box>

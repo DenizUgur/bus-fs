@@ -27,7 +27,7 @@ router.get("/", async (req, res) => {
 
 	if (!file.enabled)
 		return res.render("index", {
-			message: "This homework is not available yet.",
+			message: "This assignment is not available yet.",
 			serve: false,
 		});
 
@@ -61,7 +61,7 @@ router.get("/download/:type", async (req, res) => {
 
 	if (!file.enabled)
 		return res.render("index", {
-			message: "This homework is not available yet.",
+			message: "This assignment is not available yet.",
 			serve: false,
 		});
 
