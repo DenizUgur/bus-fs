@@ -307,13 +307,14 @@ function App() {
 											<div className="Inputs">
 												<DebouncedTextField
 													label="Access Level"
-													value={getMeta().level || 0}
+													value={getMeta().level}
 													onChange={(payload: any) =>
 														modifyMeta({
 															level: payload,
 														})
 													}
 													helperText="Only students with the specified level and above will be able to access the file"
+													key={getMeta().level}
 												/>
 												{getMeta().encrypt && (
 													<DebouncedTextField
