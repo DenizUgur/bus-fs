@@ -17,16 +17,15 @@ ADD ./webapp /opt/webapp
 RUN cd /opt/webapp/server && npm ci && npm run build
 RUN cd /opt/webapp/ui && npm ci && npm run build
 
-# Run the image as a non-root user
-RUN adduser node
-RUN mkdir -p /opt/encryptor
-RUN chown node:node /opt/encryptor
-USER node
-
 # Build Excel Encryptor
-RUN cd /opt/encryptor && \
+RUN mkdir -p /opt/encryptor && cd /opt/encryptor && \
     git clone https://github.com/herumi/cybozulib && \
     git clone https://github.com/herumi/msoffice
+
+# Compile the app
+RUN cd /opt/encryptor/msoffice && \
+    sed -i -e "s/-march=native/-march=ivybridge/g" common.mk && \
+    make -j RELEASE=1
 
 ENV NODE_ENV="production"
 WORKDIR /opt/webapp

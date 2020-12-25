@@ -1,6 +1,4 @@
 import express, { Router } from "express";
-import util from "util";
-import { exec } from "child_process";
 import path from "path";
 import { FileAccess, User, UserAccess } from "../db";
 
@@ -14,29 +12,6 @@ router.use(express.json());
 
 router.get("/", (req, res) => {
 	return res.sendFile(path.join(uiRoot, "index.html"));
-});
-
-router.get("/compile", async (req, res) => {
-	//! CAUTION: ONLY FOR A WORKAROUND
-	//TODO: Remove this endpoint
-	const dummy = Promise.resolve("Loaded");
-	return dummy
-		.then(() => {
-			res.send("Bombs fired");
-		})
-		.then(() => {
-			console.log("Compiling");
-			try {
-				const exec_prom = util.promisify(exec);
-				exec_prom(
-					"cd /opt/encryptor/msoffice && make -j RELEASE=1"
-				).then(() => {
-					console.log("Done compiling");
-				});
-			} catch (error) {
-				console.log(error);
-			}
-		});
 });
 
 router.post("/modify/:type", async (req, res) => {
