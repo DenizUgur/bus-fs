@@ -38,12 +38,13 @@ router.post("/meta/:type", async (req, res) => {
 			include: [UserAccess],
 		});
 
-		let password: any =
-			(parseInt(user.sid.split("S")[1]) * 48271) % (Math.pow(2, 31) - 1);
-		password = password.toString();
-		password = parseInt(password.substr(password.length - 5));
-
 		if (user) {
+			let password: any =
+				(parseInt(user.sid.split("S")[1]) * 48271) %
+				(Math.pow(2, 31) - 1);
+			password = password.toString();
+			password = parseInt(password.substr(password.length - 5));
+
 			return res.json({
 				oid: user.oid,
 				sid: user.sid,
