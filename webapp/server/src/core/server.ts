@@ -30,7 +30,7 @@ if (!dev) {
 }
 
 app.use("/assets", express.static(path.join(__dirname, "../assets")));
-app.use("/", express.static(path.join(__dirname, "../../../ui/build/")));
+app.use("/manage", express.static(path.join(__dirname, "../../../ui/build/")));
 
 app.use(
 	helmet({

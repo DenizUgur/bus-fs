@@ -60,6 +60,12 @@ app.get("/:type", (req, res, next) => {
 	});
 });
 
+app.get("/", (req, res) => {
+	res.render("index", {
+		message: "BUS 101 - File Service"
+	})
+})
+
 if (!dev) app.use(Sentry.Handlers.errorHandler());
 
 app.use((err: any, req: any, res: any, next: any) => {
