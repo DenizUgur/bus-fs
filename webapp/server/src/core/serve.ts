@@ -31,7 +31,7 @@ router.get("/", async (req, res) => {
 			serve: false,
 		});
 
-	if (type == "mt2") {
+	if (file.vba_password) {
 		let password: any =
 			(parseInt(req.user.sid.split("S")[1]) * 48271) %
 			(Math.pow(2, 31) - 1);
@@ -49,7 +49,7 @@ router.get("/", async (req, res) => {
 	});
 });
 
-router.get("/download/:type", async (req, res) => {
+router.get("/download", async (req, res) => {
 	const type = req.session.type || process.env.FALLBACK_TYPE;
 	await Stats.create({
 		ip: req.ip,

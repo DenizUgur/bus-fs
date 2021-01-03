@@ -88,6 +88,10 @@ const FileAccess = sequelize.define(
 			type: DataTypes.BOOLEAN,
 			defaultValue: false,
 		},
+		vba_password: {
+			type: DataTypes.BOOLEAN,
+			defaultValue: false,
+		},
 		password: {
 			type: DataTypes.STRING,
 			allowNull: true,

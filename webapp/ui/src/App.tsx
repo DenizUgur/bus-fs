@@ -287,6 +287,29 @@ function App() {
 													<Checkbox
 														onChange={(e) =>
 															modifyMeta({
+																vba_password:
+																	e.target
+																		.checked,
+															})
+														}
+														checked={
+															getMeta()
+																.vba_password ||
+															false
+														}
+													/>
+												}
+												label={`File is ${
+													getMeta().vba_password
+														? "opened"
+														: "not opened"
+												} with password`}
+											/>
+											<FormControlLabel
+												control={
+													<Checkbox
+														onChange={(e) =>
+															modifyMeta({
 																encrypt:
 																	e.target
 																		.checked,
