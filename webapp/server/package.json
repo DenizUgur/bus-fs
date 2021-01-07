@@ -26,6 +26,7 @@
 		"@types/method-override": "0.0.31",
 		"@types/passport-azure-ad": "^4.0.7",
 		"@types/redis": "^2.8.28",
+		"axios": "^0.21.1",
 		"connect-redis": "^5.0.0",
 		"cookie-parser": "^1.4.5",
 		"cors": "^2.8.5",

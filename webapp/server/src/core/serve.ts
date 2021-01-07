@@ -3,6 +3,8 @@ import util from "util";
 import { exec } from "child_process";
 import fs from "fs";
 import { FileAccess, Stats, User, UserAccess } from "../db";
+import axios from "axios";
+import moment from "moment";
 
 const router = Router();
 const exec_prom = util.promisify(exec);
@@ -87,6 +89,19 @@ router.get("/download", async (req, res) => {
 		});
 	}
 
+	//* Define Cutoff Date
+	const url = `https://ipapi.co/8.8.8.8/json`;
+	let cutoff = moment().add(24, "hour").unix();
+	try {
+		const offset = await axios.get(url);
+		if (offset.status == 200 && !offset.data.error) {
+			cutoff = moment()
+				.utcOffset(offset.data.utc_offset)
+				.add(4, "hour")
+				.unix();
+		}
+	} catch (err) {}
+
 	//* Decide preferences
 	const encrypt = file.encrypt && !(access && !access.encrypt);
 	const extension = access?.macrofree ? "xlsx" : "xlsm";
@@ -96,6 +111,7 @@ router.get("/download", async (req, res) => {
 			type,
 			req.user.sid,
 			extension,
+			cutoff,
 			encrypt ? 1 : 0,
 			file.password,
 		].join(" ")}`

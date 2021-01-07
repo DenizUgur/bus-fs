@@ -10,8 +10,9 @@ if __name__ == "__main__":
     temp_file = sys.argv[1]
     student_id = sys.argv[2]
     extension = sys.argv[3]
-    encrypt = True if int(sys.argv[4]) == 1 else False
-    password = sys.argv[5] if len(sys.argv) == 6 else ""
+    cutoff = sys.argv[4]
+    encrypt = True if int(sys.argv[5]) == 1 else False
+    password = sys.argv[6] if len(sys.argv) == 7 else ""
 
     # Create /out folder if not exists
     if not os.path.exists("../data/out"):
@@ -42,12 +43,13 @@ if __name__ == "__main__":
         "../data/tmp/{}_{}".format(student_id, extension),
     )
 
-    # Change Student ID
+    # Change Student ID and add cutoff date
     with open(
         "../data/tmp/{}_{}/xl/sharedStrings.xml".format(student_id, extension), "r"
     ) as fp:
         raw = fp.read()
         raw = raw.replace("S000001", student_id)
+        raw = raw.replace("#UNIX", cutoff)
 
     with open(
         "../data/tmp/{}_{}/xl/sharedStrings.xml".format(student_id, extension), "w"
