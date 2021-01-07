@@ -101,8 +101,11 @@ router.get("/download", async (req, res) => {
 		].join(" ")}`
 	)
 		.then(() => {
+			const sourceFile = `../data/out/${req.user.sid}_${type}${
+				encrypt ? "_enc" : ""
+			}.${extension}`;
 			res.download(
-				`../data/out/${req.user.sid}_${type}.${extension}`,
+				sourceFile,
 				`${req.user.sid}_${type}.${extension}`,
 				async (error) => {
 					if (error) throw error;
@@ -112,9 +115,7 @@ router.get("/download", async (req, res) => {
 						type: type,
 						userOid: user.dataValues.oid,
 					});
-					fs.unlinkSync(
-						`../data/out/${req.user.sid}_${type}.${extension}`
-					);
+					fs.unlinkSync(sourceFile);
 				}
 			);
 		})

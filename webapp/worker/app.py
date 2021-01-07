@@ -89,7 +89,3 @@ if __name__ == "__main__":
         )
 
         os.remove("../data/out/{}_{}.{}".format(student_id, temp_file, extension))
-        os.rename(
-            "../data/out/{}_{}_enc.{}".format(student_id, temp_file, extension),
-            "../data/out/{}_{}.{}".format(student_id, temp_file, extension),
-        )
