@@ -23,6 +23,14 @@ const isAvailable = async (type: string, level: number) => {
 	}
 };
 
+const getIndividualPassword = (id: string) => {
+	let password: any =
+		(parseInt(id.split("S")[1]) * 48271) % (Math.pow(2, 31) - 1);
+	password = password.toString();
+	password = parseInt(password.substr(password.length - 5));
+	return password;
+};
+
 router.get("/", async (req, res) => {
 	const type = req.session.type || process.env.FALLBACK_TYPE;
 	let file: any = await isAvailable(type, req.user.level);
@@ -34,14 +42,12 @@ router.get("/", async (req, res) => {
 		});
 
 	if (file.vba_password) {
-		let password: any =
-			(parseInt(req.user.sid.split("S")[1]) * 48271) %
-			(Math.pow(2, 31) - 1);
-		password = password.toString();
-		password = parseInt(password.substr(password.length - 5));
-
 		return res.render("index", {
-			message: `Hi ${req.user.displayName}, your file is currently being prepared. Please wait... Password: ${password}`,
+			message: `Hi ${
+				req.user.displayName
+			}, your file is currently being prepared. Please wait...<br><span>Password: ${getIndividualPassword(
+				req.user.sid
+			)}</span>`,
 			serve: true,
 		});
 	}
@@ -85,7 +91,9 @@ router.get("/download", async (req, res) => {
 
 	if (access?.accessed && file.onetime) {
 		return res.render("index", {
-			message: "You are not allowed to download more than once.",
+			message: `You are not allowed to download more than once.<br><span>Password: ${getIndividualPassword(
+				req.user.sid
+			)}</span>`,
 		});
 	}
 
@@ -126,10 +134,13 @@ router.get("/download", async (req, res) => {
 				async (error) => {
 					if (error) throw error;
 
+					const downloadCount = (access?.downloadCount || 0) + 1;
+
 					await UserAccess.upsert({
 						accessed: true,
 						type: type,
 						userOid: user.dataValues.oid,
+						downloadCount,
 					});
 					fs.unlinkSync(sourceFile);
 				}
@@ -141,4 +152,4 @@ router.get("/download", async (req, res) => {
 });
 
 export default router;
-export { isAvailable };
+export { isAvailable, getIndividualPassword };

@@ -62,9 +62,9 @@ app.get("/:type", (req, res, next) => {
 
 app.get("/", (req, res) => {
 	res.render("index", {
-		message: "BUS 101 - File Service"
-	})
-})
+		message: "BUS 101 - File Service",
+	});
+});
 
 if (!dev) app.use(Sentry.Handlers.errorHandler());
 
@@ -88,18 +88,13 @@ sequelize
 			// Create seed data
 			await FileAccess.bulkCreate([
 				{
-					name: "hw5",
+					name: "final",
 					enabled: true,
 					onetime: false,
-					level: 0,
-				},
-				{
-					name: "mt2",
-					enabled: true,
-					onetime: true,
 					level: 100,
-					encrypt: true,
+					encrypt: false,
 					password: "NINENINE",
+					vba_password: true,
 				},
 			]);
 			await User.create({

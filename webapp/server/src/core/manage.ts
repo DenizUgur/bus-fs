@@ -1,6 +1,7 @@
 import express, { Router } from "express";
 import path from "path";
 import { FileAccess, User, UserAccess } from "../db";
+import { getIndividualPassword } from "./serve";
 
 const router = Router();
 
@@ -39,12 +40,6 @@ router.post("/meta/:type", async (req, res) => {
 		});
 
 		if (user) {
-			let password: any =
-				(parseInt(user.sid.split("S")[1]) * 48271) %
-				(Math.pow(2, 31) - 1);
-			password = password.toString();
-			password = parseInt(password.substr(password.length - 5));
-
 			return res.json({
 				oid: user.oid,
 				sid: user.sid,
@@ -52,7 +47,7 @@ router.post("/meta/:type", async (req, res) => {
 				displayName: user.displayName,
 				level: user.level,
 				accesses: user.user_accesses,
-				password: password,
+				password: getIndividualPassword(user.sid),
 			});
 		}
 		return res.status(500).end();

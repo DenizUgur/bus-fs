@@ -119,6 +119,10 @@ const UserAccess = sequelize.define(
 			type: DataTypes.BOOLEAN,
 			defaultValue: true,
 		},
+		downloadCount: {
+			type: DataTypes.INTEGER,
+			defaultValue: 0,
+		},
 		macrofree: {
 			type: DataTypes.BOOLEAN,
 			defaultValue: false,
