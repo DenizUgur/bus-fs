@@ -25,7 +25,7 @@ const isAvailable = async (type: string, level: number) => {
 
 const getIndividualPassword = (id: string) => {
 	let password: any =
-		(parseInt(id.split("S")[1]) * 48271) % (Math.pow(2, 31) - 1);
+		(parseInt(id.split("S")[1]) * 48123) % (Math.pow(2, 31) - 1);
 	password = password.toString();
 	password = parseInt(password.substr(password.length - 5));
 	return password;
