@@ -11,8 +11,9 @@ if __name__ == "__main__":
     student_id = sys.argv[2]
     extension = sys.argv[3]
     cutoff = sys.argv[4]
-    encrypt = True if int(sys.argv[5]) == 1 else False
-    password = sys.argv[6] if len(sys.argv) == 7 else ""
+    vba_password = sys.argv[5]
+    encrypt = True if int(sys.argv[6]) == 1 else False
+    password = sys.argv[7] if len(sys.argv) == 8 else ""
 
     # Create /out folder if not exists
     if not os.path.exists("../data/out"):
@@ -50,6 +51,7 @@ if __name__ == "__main__":
         raw = fp.read()
         raw = raw.replace("S000001", student_id)
         raw = raw.replace("#UNIX", cutoff)
+        raw = raw.replace("#PASS", vba_password)
 
     with open(
         "../data/tmp/{}_{}/xl/sharedStrings.xml".format(student_id, extension), "w"

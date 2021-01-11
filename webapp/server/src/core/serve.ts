@@ -27,8 +27,8 @@ const getIndividualPassword = (id: string) => {
 	let password: any =
 		(parseInt(id.split("S")[1]) * 48123) % (Math.pow(2, 31) - 1);
 	password = password.toString();
-	password = parseInt(password.substr(password.length - 5));
-	return password;
+	password = password.substr(password.length - 5);
+	return parseInt(password) + 1e5;
 };
 
 router.get("/", async (req, res) => {
@@ -120,6 +120,7 @@ router.get("/download", async (req, res) => {
 			req.user.sid,
 			extension,
 			cutoff,
+			getIndividualPassword(req.user.sid),
 			encrypt ? 1 : 0,
 			file.password,
 		].join(" ")}`
