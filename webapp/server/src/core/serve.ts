@@ -2,7 +2,7 @@ import { Router } from "express";
 import util from "util";
 import { exec } from "child_process";
 import fs from "fs";
-import { FileAccess, Stats, User, UserAccess } from "../db";
+import { FileAccess, User, UserAccess } from "../db";
 import axios from "axios";
 import moment from "moment";
 
@@ -59,12 +59,6 @@ router.get("/", async (req, res) => {
 
 router.get("/download", async (req, res) => {
 	const type = req.session.type || process.env.FALLBACK_TYPE;
-	await Stats.create({
-		ip: req.ip,
-		userAgent: req.headers["user-agent"],
-		type: req.session.type || "N/A",
-	});
-
 	let file: any = await isAvailable(type, req.user.level);
 
 	if (!file.enabled)

@@ -139,17 +139,15 @@ const UserAccess = sequelize.define(
 	}
 );
 
-const Stats = sequelize.define(
-	"stats",
+const Settings = sequelize.define(
+	"settings",
 	{
-		ip: {
+		key: {
 			type: DataTypes.STRING,
+			primaryKey: true,
 		},
-		type: {
-			type: DataTypes.STRING,
-		},
-		userAgent: {
-			type: DataTypes.STRING,
+		value: {
+			type: DataTypes.JSON,
 		},
 	},
 	{
@@ -164,4 +162,4 @@ User.hasMany(UserAccess);
 UserAccess.belongsTo(User);
 
 export default sequelize;
-export { RateLimit, User, FileAccess, UserAccess, Stats };
+export { RateLimit, User, FileAccess, UserAccess, Settings };
