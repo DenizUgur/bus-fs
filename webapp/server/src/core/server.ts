@@ -69,7 +69,7 @@ if (dev) {
 			saveUninitialized: false,
 			cookie: {
 				secure: false,
-				sameSite: "none",
+				sameSite: "lax",
 			},
 		})
 	);
@@ -84,7 +84,7 @@ if (dev) {
 			saveUninitialized: false,
 			cookie: {
 				secure: true,
-				sameSite: "none",
+				sameSite: "lax",
 			},
 		})
 	);
