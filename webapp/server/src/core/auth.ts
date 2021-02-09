@@ -1,13 +1,14 @@
+/**
+ * @author Deniz Ugur <deniz343@gmail.com>
+ */
 import { Request, Response, Router } from "express";
 import { OIDCStrategy } from "passport-azure-ad";
 import { User } from "../db";
 const passport = require("passport");
 const config = require("../config");
 
+const dev = process.env.NODE_ENV !== "production";
 const router = Router();
-
-const list = require("../../../data/users/students.json");
-const listTA = require("../../../data/users/TAs.json");
 
 passport.serializeUser((user: any, done: any) => {
 	done(null, user.oid);
@@ -37,24 +38,6 @@ const findByOid = async (oid: any, fn: any) => {
 	} catch (error) {
 		return fn(error, null);
 	}
-};
-
-const getIdByEmail = (email: any) => {
-	const TA = listTA.find((el: any) => el.email === email);
-	const student = list.find((el: any) => el.email === email);
-	let details = {
-		level: 0,
-		sid: "",
-		enrolled: true,
-	};
-
-	if (TA) details.level = TA.level;
-	if (TA || student) {
-		details.sid = (TA || student).sid;
-	} else {
-		details.enrolled = false;
-	}
-	return details;
 };
 
 passport.use(
@@ -94,15 +77,19 @@ passport.use(
 			await findByOid(profile.oid, async (err: any, user: any) => {
 				if (err || !user) {
 					try {
-						const details: any = getIdByEmail(profile._json.email);
-						await User.create({
+						const _user = await User.findOne({
+							where: {
+								email: profile._json.email,
+							},
+						});
+
+						if (!_user) return done(null, null);
+						await _user.update({
 							oid: profile.oid,
 							displayName: profile.displayName,
-							email: profile._json.email,
-							sid: details.sid,
-							enrolled: details.enrolled,
-							level: details.level,
+							enrolled: true,
 						});
+
 						return done(null, profile);
 					} catch (error) {
 						return done(error, null);
@@ -159,8 +146,26 @@ const isAuthenticated = (req: Request, res: Response, next: any) => {
 	// Save returnTo
 	req.session.returnTo = req.originalUrl;
 
+	if (dev) {
+		req.user = {
+			displayName: "Deniz Ugur",
+			sid: "S014557",
+			oid: "test_oid",
+			email: "deniz.ugur@ozu.edu.tr",
+			enrolled: true,
+			level: 300,
+			privileges: [],
+		};
+		// Copy user to adminUser for AdminBro compatibility
+		req.session.adminUser = req.user;
+		return next();
+	}
+
 	if (req.isAuthenticated()) {
 		if (req.user) {
+			// Copy user to adminUser for AdminBro compatibility
+			req.session.adminUser = req.user;
+
 			if (req.user.enrolled) {
 				return next();
 			}
@@ -177,10 +182,22 @@ const isAuthenticated = (req: Request, res: Response, next: any) => {
 const isSeniorTA = (req: Request, res: Response, next: any) => {
 	// Save returnTo
 	req.session.returnTo = req.originalUrl;
+	let TA_treshold = 150;
+
+	if (dev) {
+		if (req.user.level >= TA_treshold) {
+			return next();
+		} else {
+			return res.render("index", {
+				message: `Sorry, you are not allowed to access this page.`,
+				serve: false,
+			});
+		}
+	}
 
 	if (req.isAuthenticated()) {
 		if (req.user) {
-			if (req.user.level > 100) {
+			if (req.user.level >= TA_treshold) {
 				return next();
 			}
 		}
@@ -194,4 +211,4 @@ const isSeniorTA = (req: Request, res: Response, next: any) => {
 };
 
 export default router;
-export { passport, isAuthenticated, isSeniorTA};
+export { passport, isAuthenticated, isSeniorTA };
