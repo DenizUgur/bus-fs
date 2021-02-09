@@ -4,7 +4,7 @@ FROM ubuntu:20.10
 # Install python, pip & node, npm
 RUN apt-get update && \
     apt-get install -y curl && \
-    curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
+    curl -sL https://deb.nodesource.com/setup_15.x | bash - && \
     apt-get install -y \
     make gcc g++ git libssl-dev \
     python3 python3-pip nodejs && \
@@ -15,7 +15,6 @@ ADD ./webapp /opt/webapp
 
 # Install dependencies
 RUN cd /opt/webapp/server && npm ci && npm run build
-RUN cd /opt/webapp/ui && npm ci && npm run build
 
 # Build Excel Encryptor
 RUN mkdir -p /opt/encryptor && cd /opt/encryptor && \

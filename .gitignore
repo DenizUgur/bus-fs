@@ -3,6 +3,8 @@ build/
 utils/
 webapp/data/out/
 webapp/data/tmp/
+.adminbro/
+seed/
 .prettierrc
 .env
 nodemon.json
