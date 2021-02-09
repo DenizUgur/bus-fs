@@ -1,3 +1,6 @@
+/**
+ * @author Deniz Ugur <deniz343@gmail.com>
+ */
 import { Router } from "express";
 import util from "util";
 import { exec } from "child_process";
@@ -92,7 +95,7 @@ router.get("/download", async (req, res) => {
 	}
 
 	//* Define Cutoff Date
-	const url = `https://ipapi.co/8.8.8.8/json`;
+	const url = `https://ipapi.co/${req.ip}/json`;
 	let cutoff = moment().add(24, "hour").unix();
 	try {
 		const offset = await axios.get(url);
