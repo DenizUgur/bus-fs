@@ -281,7 +281,7 @@ const flushFiles = () => {
 		await sequelize.transaction(async (transaction) => {
 			//* Disable access to files
 			const files = await FileAccess.findAll({ transaction });
-			if (files?.length == 0) return reject("No files on database");
+			if (files?.length == 0) return resolve("No files on database");
 
 			let prev: any = {};
 			for (const file of files) {
@@ -316,6 +316,7 @@ const flushFiles = () => {
 					);
 				}
 			} catch (error) {
+				console.error(error);
 				reject(error);
 			}
 
