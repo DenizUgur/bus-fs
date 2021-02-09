@@ -1,3 +1,6 @@
+/**
+ * @author Deniz Ugur <deniz343@gmail.com>
+ */
 import sequelize from "../db";
 import { RateLimiterPostgres } from "rate-limiter-flexible";
 
@@ -11,9 +14,11 @@ const opts = {
 	clearExpiredByTimeout: true,
 };
 
+const dev = process.env.NODE_ENV !== "production";
 const rateLimiterDefault = new RateLimiterPostgres(opts);
 
 const rateLimiterMiddleware = (req: any, res: any, next: any) => {
+	if (dev) return next();
 	rateLimiterDefault
 		.consume(req.user.email, 1)
 		.then((RLResponse) => {

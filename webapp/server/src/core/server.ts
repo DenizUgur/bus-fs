@@ -1,3 +1,6 @@
+/**
+ * @author Deniz Ugur <deniz343@gmail.com>
+ */
 import express from "express";
 import helmet from "helmet";
 import cors from "cors";
@@ -8,6 +11,8 @@ import session from "express-session";
 import cookieParser from "cookie-parser";
 import * as Tracing from "@sentry/tracing";
 import * as Sentry from "@sentry/node";
+import { passport } from "./auth";
+import prepareAdmin from "../admin";
 
 const dev = process.env.NODE_ENV !== "production";
 
@@ -30,26 +35,8 @@ if (!dev) {
 }
 
 app.use("/assets", express.static(path.join(__dirname, "../assets")));
-app.use("/manage", express.static(path.join(__dirname, "../../../ui/build/")));
 
-app.use(
-	helmet({
-		contentSecurityPolicy: {
-			directives: {
-				defaultSrc: ["'self'", "fonts.googleapis.com"],
-				fontSrc: [
-					"'self'",
-					"fonts.googleapis.com",
-					"fonts.gstatic.com",
-				],
-				styleSrc: ["'self'", "'unsafe-inline'", "fonts.googleapis.com"],
-				scriptSrc: ["'self'", "'unsafe-inline'"],
-				objectSrc: ["'none'"],
-				upgradeInsecureRequests: [],
-			},
-		},
-	})
-);
+app.use(helmet({ contentSecurityPolicy: false }));
 app.use(
 	cors({
 		origin: dev ? "*" : "https://bus-fs.herokuapp.com/",
@@ -89,5 +76,24 @@ if (dev) {
 		})
 	);
 }
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use((req, res, next) => {
+	if (req.url.match(/\/(?:auth|serve|manage)/))
+		passport.authenticate("session", (err: any, user: any, info: any) => {
+			if (err) req.logOut();
+			if (!user) return res.redirect("/auth/login");
+
+			req.logIn(user, (err) => {
+				if (err) return next(err);
+				return next();
+			});
+		})(req, res, next);
+	else next();
+});
+
+// Initialize Admin UI
+prepareAdmin(app);
 
 export default app;

@@ -1,6 +1,11 @@
+/**
+ * @author Deniz Ugur <deniz343@gmail.com>
+ */
 import { Sequelize, DataTypes } from "sequelize";
+const dev = process.env.NODE_ENV !== "production";
+
 let sequelize: Sequelize;
-if (process.env.NODE_ENV == "production") {
+if (!dev) {
 	if (process.env.DATABASE_URL == undefined) {
 		throw new Error("DATABASE_URL is not available");
 	} else {
@@ -58,6 +63,11 @@ const User = sequelize.define(
 		},
 		level: {
 			type: DataTypes.INTEGER,
+			defaultValue: 0,
+		},
+		privileges: {
+			type: DataTypes.ARRAY(DataTypes.STRING),
+			allowNull: true,
 		},
 	},
 	{
@@ -83,6 +93,9 @@ const FileAccess = sequelize.define(
 		},
 		level: {
 			type: DataTypes.INTEGER,
+		},
+		files: {
+			type: DataTypes.JSON,
 		},
 		encrypt: {
 			type: DataTypes.BOOLEAN,

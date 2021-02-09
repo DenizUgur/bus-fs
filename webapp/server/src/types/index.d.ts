@@ -1,3 +1,6 @@
+/**
+ * @author Deniz Ugur <deniz343@gmail.com>
+ */
 declare namespace Express {
 	export interface Request {
 		user: {
@@ -7,6 +10,7 @@ declare namespace Express {
 			sid: string;
 			enrolled: boolean;
 			level: number;
+			privileges: string[];
 		};
 		session: any;
 	}
