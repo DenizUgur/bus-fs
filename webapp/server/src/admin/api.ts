@@ -252,7 +252,9 @@ router.post("/file/:fileid", async (req, res) => {
 
 	//* Save files to a temporary destination
 	try {
-		await fs.rm(`/tmp/${fileID}`, { recursive: true });
+		try {
+			await fs.rm(`/tmp/${fileID}`, { recursive: true });
+		} catch (error) {}
 		await fs.mkdir(`/tmp/${fileID}`);
 		await fs.writeFile(`/tmp/${keys.macrofree.aws}`, freeFile.data);
 		await fs.writeFile(`/tmp/${keys.macroenabled.aws}`, enabledFile.data);
