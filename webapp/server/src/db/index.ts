@@ -45,14 +45,14 @@ const RateLimit = sequelize.define(
 const User = sequelize.define(
 	"user",
 	{
-		oid: {
+		email: {
 			type: DataTypes.STRING,
 			primaryKey: true,
 		},
-		displayName: {
+		oid: {
 			type: DataTypes.STRING,
 		},
-		email: {
+		displayName: {
 			type: DataTypes.STRING,
 		},
 		sid: {
