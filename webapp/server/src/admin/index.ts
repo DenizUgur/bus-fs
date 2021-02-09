@@ -27,28 +27,89 @@ const canEditFile = ({ currentAdmin, record }: any) => {
 	);
 };
 
-const defaultActionProps = {
-	list: {
-		isAccessible: true,
-	},
-	search: {
-		isAccessible: true,
-	},
-	show: {
-		isAccessible: true,
-	},
-	edit: {
-		isAccessible: isSuperUser,
-	},
-	new: {
-		isAccessible: isSuperUser,
-	},
-	bulkDelete: {
-		isAccessible: isSuperUser,
-	},
-	delete: {
-		isAccessible: isSuperUser,
-	},
+const newRecordHandler = (table: any) => {
+	const _handle = async (request: any, response: any, context: any) => {
+		const { resource, h, currentAdmin, translateMessage } = context;
+		if (request.method === "post") {
+			let record = await resource.build(
+				request.payload ? request.payload : {}
+			);
+
+			// eslint-disable-next-line no-param-reassign
+			context.record = record;
+
+			if (record.isValid()) {
+				await table.create(request.payload);
+				return {
+					redirectUrl: h.resourceUrl({
+						resourceId: resource._decorated?.id() || resource.id(),
+					}),
+					notice: {
+						message: translateMessage(
+							"successfullyCreated",
+							resource.id()
+						),
+						type: "success",
+					},
+					record: record.toJSON(currentAdmin),
+				};
+			}
+			return {
+				record: record.toJSON(currentAdmin),
+				notice: {
+					message: translateMessage(
+						"thereWereValidationErrors",
+						resource.id()
+					),
+					type: "error",
+				},
+			};
+		}
+		// TODO: add wrong implementation error
+		throw new Error(
+			"new action can be invoked only via `post` http method"
+		);
+	};
+	return _handle;
+};
+
+const defaultActionProps = (table: any) => {
+	return {
+		list: {
+			isAccessible: true,
+		},
+		search: {
+			isAccessible: true,
+		},
+		show: {
+			isAccessible: true,
+		},
+		edit: {
+			isAccessible: isSuperUser,
+		},
+		new: {
+			isAccessible: isSuperUser,
+			handler: newRecordHandler(table),
+		},
+		bulkDelete: {
+			isAccessible: isSuperUser,
+		},
+		delete: {
+			isAccessible: isSuperUser,
+		},
+	};
+};
+
+const LSEProperties = (
+	list: string[],
+	show: string[] = [],
+	edit: string[] = []
+) => {
+	return {
+		listProperties: [...list],
+		showProperties: [...list, ...show],
+		editProperties: [...list, ...show, ...edit],
+	};
 };
 
 const addUserAttributes: After<ActionResponse> = async (
@@ -72,9 +133,13 @@ const options: AdminBroOptions = {
 		{
 			resource: User,
 			options: {
-				listProperties: ["displayName", "email", "level", "sid"],
+				...LSEProperties(
+					["displayName", "email", "level", "sid"],
+					[],
+					["oid", "enrolled", "privileges"]
+				),
 				actions: {
-					...defaultActionProps,
+					...defaultActionProps(User),
 					updateStudents: {
 						actionType: "resource",
 						isAccessible: isSuperUser,
@@ -91,6 +156,11 @@ const options: AdminBroOptions = {
 		{
 			resource: UserAccess,
 			options: {
+				...LSEProperties(
+					["type", "userOid", "accessed"],
+					["downloadCount"],
+					["macrofree", "encrypt"]
+				),
 				properties: {
 					sid: {
 						isVisible: {
@@ -102,7 +172,7 @@ const options: AdminBroOptions = {
 					},
 				},
 				actions: {
-					...defaultActionProps,
+					...defaultActionProps(UserAccess),
 					edit: {
 						isAccessible: true,
 					},
@@ -116,15 +186,13 @@ const options: AdminBroOptions = {
 		{
 			resource: FileAccess,
 			options: {
-				listProperties: [
-					"name",
-					"enabled",
-					"level",
-					"encrypt",
-					"onetime",
-				],
+				...LSEProperties(
+					["name", "level", "enabled", "encrypt", "onetime"],
+					["password", "vba_password"],
+					["files"]
+				),
 				actions: {
-					...defaultActionProps,
+					...defaultActionProps(FileAccess),
 					edit: {
 						isAccessible: canEditFile,
 					},
