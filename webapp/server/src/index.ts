@@ -1,58 +1,23 @@
+/**
+ * @author Deniz Ugur <deniz343@gmail.com>
+ */
 import app from "./core/server";
 import * as Sentry from "@sentry/node";
-
-const dev = process.env.NODE_ENV !== "production";
 
 //////////////////////////
 //		APP START		//
 //////////////////////////
-import sequelize, { FileAccess, User } from "./db";
 import routerServe from "./core/serve";
-import routerManage from "./core/manage";
-import routerAuth, { passport, isAuthenticated, isSeniorTA } from "./core/auth";
+import routerAuth, { isAuthenticated } from "./core/auth";
 import rateLimiterMiddleware from "./core/rateLimiter";
+import sequelize, { FileAccess, User, UserAccess } from "./db";
+import { flushFiles } from "./admin/api";
 
-// Initialize Passport
-app.use(passport.initialize());
-app.use((req, res, next) => {
-	if (req.url.match(/\/(?:auth|serve|manage)/))
-		passport.authenticate("session", (err: any, user: any, info: any) => {
-			if (err) req.logOut();
-			if (!user) return res.redirect("/auth/login");
-
-			req.logIn(user, (err) => {
-				if (err) return next(err);
-				return next();
-			});
-		})(req, res, next);
-	else next();
-});
-
+const dev = process.env.NODE_ENV !== "production";
 app.use("/auth", routerAuth);
+app.use("/serve", [isAuthenticated, rateLimiterMiddleware, routerServe]);
 
-if (dev) {
-	app.use("/manage", routerManage);
-	app.use(
-		"/serve",
-		(req, res, next) => {
-			req.user = {
-				displayName: "Deniz Ugur",
-				sid: "S014557",
-				oid: "test_oid",
-				email: "deniz.ugur@ozu.edu.tr",
-				enrolled: true,
-				level: 100,
-			};
-			next();
-		},
-		routerServe
-	);
-} else {
-	app.use("/manage", [isAuthenticated, isSeniorTA, routerManage]);
-	app.use("/serve", [isAuthenticated, rateLimiterMiddleware, routerServe]);
-}
-
-app.get("/:type", (req, res, next) => {
+app.get("/f/:type", (req, res, next) => {
 	req.session.type = req.params.type;
 	return res.render("index", {
 		message: "Redirecting you to your assignment.",
@@ -63,6 +28,12 @@ app.get("/:type", (req, res, next) => {
 app.get("/", (req, res) => {
 	res.render("index", {
 		message: "BUS 101 - File Service",
+	});
+});
+
+app.use((req, res) => {
+	res.render("index", {
+		message: "The page you are looking does not exists.",
 	});
 });
 
@@ -84,27 +55,80 @@ const PORT = process.env.PORT || 5000;
 sequelize
 	.sync({ force: process.env.NODE_ENV != "production" })
 	.then(async () => {
-		if (dev) {
-			// Create seed data
-			await FileAccess.bulkCreate([
-				{
-					name: "final",
-					enabled: true,
-					onetime: false,
-					level: 100,
-					encrypt: false,
-					password: "NINENINE",
-					vba_password: true,
-				},
-			]);
-			await User.create({
-				oid: "test_oid",
-				displayName: "Deniz Ugur",
-				email: "deniz.ugur@ozu.edu.tr",
-				sid: "S014557",
-				enrolled: true,
-				level: 100,
-			});
-		}
-		app.listen(PORT, () => console.log(`Listening on ${PORT}`));
+		app.listen(PORT, async () => {
+			try {
+				if (dev) {
+					const csv = require("csv-parser");
+					const fs = require("fs");
+					// Create seed data
+					let users: any = [];
+					await fs
+						.createReadStream("seed/user.csv")
+						.pipe(csv())
+						.on("data", (row: any) => {
+							users.push(row);
+						})
+						.on("end", async () => {
+							console.log(users);
+							await User.bulkCreate(users);
+						});
+
+					let user_access: any = [];
+					await fs
+						.createReadStream("seed/user_access.csv")
+						.pipe(csv())
+						.on("data", (row: any) => {
+							user_access.push(row);
+						})
+						.on("end", async () => {
+							await UserAccess.bulkCreate(user_access);
+						});
+
+					let file_access: any = [];
+					await fs
+						.createReadStream("seed/file_access.csv")
+						.pipe(csv())
+						.on("data", (row: any) => {
+							file_access.push(row);
+						})
+						.on("end", async () => {
+							await FileAccess.bulkCreate(file_access);
+							const comp = await FileAccess.findByPk("comp");
+							await comp?.update({
+								files: {
+									macrofree: {
+										aws: "comp/qd206VXgPsYTIjAJAJVOW_free",
+										actual: "comp_template.xlsx",
+									},
+									macroenabled: {
+										aws: "comp/oVKxdEMIF754B4ADHvzd8_macro",
+										actual: "comp_template.xlsm",
+									},
+								},
+							});
+							const final = await FileAccess.findByPk("final");
+							await final?.update({
+								files: {
+									macrofree: {
+										aws: "final/HXKwPQL7b7t2MpdTY3E3S_free",
+										actual: "final_template.xlsx",
+									},
+									macroenabled: {
+										aws:
+											"final/KUB9wnw_GppDLt7J6GNUy_macro",
+										actual: "final_template.xlsm",
+									},
+								},
+							});
+							await flushFiles();
+						});
+				} else {
+					await flushFiles();
+				}
+			} catch (error) {
+				console.error(error);
+				throw new Error("Something is seriously wrong!");
+			}
+			console.log(`Listening on ${PORT}`);
+		});
 	});
