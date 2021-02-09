@@ -101,7 +101,11 @@ router.post("/user", async (req, res) => {
 			let present = data.find(
 				(el: Cell) => user.dataValues.email == el.email
 			);
-			if (!present)
+			if (
+				!present &&
+				((isTA && user.dataValues.level > 0) ||
+					(!isTA && user.dataValues.level == 0))
+			)
 				data.push({
 					email: user.dataValues.email,
 					sid: user.dataValues.sid,

@@ -80,7 +80,7 @@ if (dev) {
 // Initialize Passport
 app.use(passport.initialize());
 app.use((req, res, next) => {
-	if (req.url.match(/\/(?:auth|serve|manage)/))
+	if (req.url.match(/\/(?:auth|serve|manage|api)/))
 		passport.authenticate("session", (err: any, user: any, info: any) => {
 			if (err) req.logOut();
 			if (!user) return res.redirect("/auth/login");

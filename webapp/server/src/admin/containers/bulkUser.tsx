@@ -40,6 +40,7 @@ export default function bulkUser(props: any) {
 			form.append("file", state.file);
 			fetch(`/api/user?ta=${isTA}&dry=${dry}`, {
 				method: "POST",
+				credentials: "same-origin",
 				body: form,
 			}).then(async (res) => {
 				if (res.status !== 200) {

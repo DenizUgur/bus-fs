@@ -41,6 +41,7 @@ export default function fileUpload(props: any) {
 		form.append("macroenabled", state.macro_enabled);
 		fetch(`/api/file/${fileID}`, {
 			method: "POST",
+			credentials: "same-origin",
 			body: form,
 		}).then(async (res) => {
 			if (res.status !== 200) {
