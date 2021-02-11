@@ -15,6 +15,7 @@ ADD ./webapp /opt/webapp
 
 # Install dependencies
 RUN cd /opt/webapp/server && npm ci && npm run build
+RUN mkdir -p /opt/webapp/data/templates
 
 # Build Excel Encryptor
 RUN mkdir -p /opt/encryptor && cd /opt/encryptor && \
