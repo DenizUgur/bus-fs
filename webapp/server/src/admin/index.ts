@@ -19,10 +19,14 @@ const isSuperUser = ({ currentAdmin }: any) => {
 	return currentAdmin && currentAdmin.level == 300;
 };
 
+const isManager = ({ currentAdmin }: any) => {
+	return currentAdmin && currentAdmin.level >= 200;
+};
+
 const canEditFile = ({ currentAdmin, record }: any) => {
 	return (
 		currentAdmin &&
-		(isSuperUser({ currentAdmin }) ||
+		(isManager({ currentAdmin }) ||
 			currentAdmin.privileges.includes(record.params.name))
 	);
 };
@@ -65,7 +69,6 @@ const newRecordHandler = (table: any) => {
 				},
 			};
 		}
-		// TODO: add wrong implementation error
 		throw new Error(
 			"new action can be invoked only via `post` http method"
 		);
@@ -85,10 +88,10 @@ const defaultActionProps = (table: any) => {
 			isAccessible: true,
 		},
 		edit: {
-			isAccessible: isSuperUser,
+			isAccessible: isManager,
 		},
 		new: {
-			isAccessible: isSuperUser,
+			isAccessible: isManager,
 			handler: newRecordHandler(table),
 		},
 		bulkDelete: {
@@ -142,12 +145,12 @@ const options: AdminBroOptions = {
 					...defaultActionProps(User),
 					updateStudents: {
 						actionType: "resource",
-						isAccessible: isSuperUser,
+						isAccessible: isManager,
 						component: AdminBro.bundle("./containers/bulkUser"),
 					},
 					updateAssistants: {
 						actionType: "resource",
-						isAccessible: isSuperUser,
+						isAccessible: isManager,
 						component: AdminBro.bundle("./containers/bulkUser"),
 					},
 				},

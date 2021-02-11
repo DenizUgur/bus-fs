@@ -67,7 +67,7 @@ const User = sequelize.define(
 		},
 		privileges: {
 			type: DataTypes.ARRAY(DataTypes.STRING),
-			allowNull: true,
+			defaultValue: [],
 		},
 	},
 	{
