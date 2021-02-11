@@ -115,22 +115,6 @@ const LSEProperties = (
 	};
 };
 
-const addUserAttributes: After<ActionResponse> = async (
-	response,
-	request,
-	context
-) => {
-	const records: RecordJSON[] = response.records || [];
-	response.records = records.map((record) => ({
-		...record,
-		params: {
-			...record.params,
-			sid: record.populated.userOid?.params.sid,
-		},
-	}));
-	return response;
-};
-
 const options: AdminBroOptions = {
 	resources: [
 		{
@@ -160,16 +144,11 @@ const options: AdminBroOptions = {
 			resource: UserAccess,
 			options: {
 				...LSEProperties(
-					["type", "userOid", "accessed"],
+					["type", "email", "accessed"],
 					["downloadCount"],
 					["macrofree", "encrypt"]
 				),
 				properties: {
-					sid: {
-						isVisible: {
-							list: true,
-						},
-					},
 					downloadCount: {
 						isDisabled: true,
 					},
@@ -178,10 +157,6 @@ const options: AdminBroOptions = {
 					...defaultActionProps(UserAccess),
 					edit: {
 						isAccessible: true,
-					},
-					list: {
-						isAccessible: true,
-						after: addUserAttributes,
 					},
 				},
 			},
