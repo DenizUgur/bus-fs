@@ -10,7 +10,7 @@ import * as Sentry from "@sentry/node";
 import routerServe from "./core/serve";
 import routerAuth, { isAuthenticated } from "./core/auth";
 import rateLimiterMiddleware from "./core/rateLimiter";
-import sequelize, { FileAccess, User, UserAccess } from "./db";
+import sequelize, { FileAccess } from "./db";
 import { flushFiles } from "./admin/api";
 
 const dev = process.env.NODE_ENV !== "production";
@@ -58,73 +58,13 @@ sequelize
 		app.listen(PORT, async () => {
 			try {
 				if (dev) {
-					const csv = require("csv-parser");
-					const fs = require("fs");
-					// Create seed data
-					let users: any = [];
-					await fs
-						.createReadStream("seed/user.csv")
-						.pipe(csv())
-						.on("data", (row: any) => {
-							users.push(row);
-						})
-						.on("end", async () => {
-							console.log(users);
-							await User.bulkCreate(users);
-						});
-
-					let user_access: any = [];
-					await fs
-						.createReadStream("seed/user_access.csv")
-						.pipe(csv())
-						.on("data", (row: any) => {
-							user_access.push(row);
-						})
-						.on("end", async () => {
-							await UserAccess.bulkCreate(user_access);
-						});
-
-					let file_access: any = [];
-					await fs
-						.createReadStream("seed/file_access.csv")
-						.pipe(csv())
-						.on("data", (row: any) => {
-							file_access.push(row);
-						})
-						.on("end", async () => {
-							await FileAccess.bulkCreate(file_access);
-							const comp = await FileAccess.findByPk("comp");
-							await comp?.update({
-								files: {
-									macrofree: {
-										aws: "comp/qd206VXgPsYTIjAJAJVOW_free",
-										actual: "comp_template.xlsx",
-									},
-									macroenabled: {
-										aws: "comp/oVKxdEMIF754B4ADHvzd8_macro",
-										actual: "comp_template.xlsm",
-									},
-								},
-							});
-							const final = await FileAccess.findByPk("final");
-							await final?.update({
-								files: {
-									macrofree: {
-										aws: "final/HXKwPQL7b7t2MpdTY3E3S_free",
-										actual: "final_template.xlsx",
-									},
-									macroenabled: {
-										aws:
-											"final/KUB9wnw_GppDLt7J6GNUy_macro",
-										actual: "final_template.xlsm",
-									},
-								},
-							});
-							await flushFiles();
-						});
-				} else {
-					await flushFiles();
+					await FileAccess.create({
+						name: "final",
+						level: 300,
+						enabled: true,
+					});
 				}
+				await flushFiles();
 			} catch (error) {
 				console.error(error);
 				throw new Error("Something is seriously wrong!");
