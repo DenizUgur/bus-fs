@@ -144,8 +144,8 @@ const options: AdminBroOptions = {
 			resource: UserAccess,
 			options: {
 				...LSEProperties(
-					["type", "email", "accessed"],
-					["downloadCount"],
+					["type", "userEmail", "accessed", "downloadCount"],
+					[],
 					["macrofree", "encrypt"]
 				),
 				properties: {
@@ -167,7 +167,7 @@ const options: AdminBroOptions = {
 				...LSEProperties(
 					["name", "level", "enabled", "encrypt", "onetime"],
 					["password", "vba_password"],
-					["files"]
+					[]
 				),
 				actions: {
 					...defaultActionProps(FileAccess),

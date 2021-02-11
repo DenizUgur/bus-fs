@@ -137,7 +137,7 @@ router.get("/download", async (req, res) => {
 					await UserAccess.upsert({
 						accessed: true,
 						type: type,
-						userOid: user.dataValues.oid,
+						userEmail: user.dataValues.email,
 						downloadCount,
 					});
 					fs.unlinkSync(sourceFile);

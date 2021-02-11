@@ -142,7 +142,7 @@ router.get("/logout", (req, res) => {
 	});
 });
 
-const isAuthenticated = (req: Request, res: Response, next: any) => {
+const isAuthenticated = async (req: Request, res: Response, next: any) => {
 	// Save returnTo
 	req.session.returnTo = req.originalUrl;
 
@@ -156,6 +156,7 @@ const isAuthenticated = (req: Request, res: Response, next: any) => {
 			level: 300,
 			privileges: [],
 		};
+		await User.upsert(req.user);
 		// Copy user to adminUser for AdminBro compatibility
 		req.session.adminUser = req.user;
 		return next();
