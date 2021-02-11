@@ -120,7 +120,7 @@ const FileAccess = sequelize.define(
 const UserAccess = sequelize.define(
 	"user_access",
 	{
-		userOid: {
+		email: {
 			type: DataTypes.STRING,
 			primaryKey: true,
 		},
