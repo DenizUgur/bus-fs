@@ -2,6 +2,7 @@
  * @author Deniz Ugur <deniz343@gmail.com>
  */
 import { Sequelize, DataTypes } from "sequelize";
+import { aws_delete } from "../core/aws";
 const dev = process.env.NODE_ENV !== "production";
 
 let sequelize: Sequelize;
@@ -114,6 +115,16 @@ const FileAccess = sequelize.define(
 		freezeTableName: true,
 		createdAt: false,
 		updatedAt: false,
+		hooks: {
+			afterDestroy: async (file: any, _) => {
+				if (file.files) {
+					try {
+						await aws_delete(file.files.macrofree.aws);
+						await aws_delete(file.files.macroenabled.aws);
+					} catch (_) {}
+				}
+			},
+		},
 	}
 );
 

@@ -57,13 +57,6 @@ sequelize
 	.then(async () => {
 		app.listen(PORT, async () => {
 			try {
-				if (dev) {
-					await FileAccess.create({
-						name: "final",
-						level: 300,
-						enabled: true,
-					});
-				}
 				await flushFiles();
 			} catch (error) {
 				console.error(error);
