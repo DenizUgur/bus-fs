@@ -207,18 +207,18 @@ router.post("/file/:fileid", async (req, res) => {
 		macrofree: {
 			aws: `${fileID}/${nanoid()}_free`,
 			actual: `${fileID}_template.xlsx`,
+			out: `${fileID}_template_xlsx`,
 		},
 		macroenabled: {
 			aws: `${fileID}/${nanoid()}_macro`,
 			actual: `${fileID}_template.xlsm`,
+			out: `${fileID}_template_xlsm`,
 		},
 	};
 
 	const rollback = async (error: any, restore = true) => {
 		console.error(error);
-		try {
-			await fs.rm(`/tmp/${fileID}`, { recursive: true });
-		} catch (error) {}
+		await fs.rm(`/tmp/${fileID}`, { recursive: true, force: true });
 		await aws_delete(keys.macrofree.aws);
 		await aws_delete(keys.macroenabled.aws);
 		await file.update({ enabled: restore ? initialState : false });
@@ -252,9 +252,7 @@ router.post("/file/:fileid", async (req, res) => {
 
 	//* Save files to a temporary destination
 	try {
-		try {
-			await fs.rm(`/tmp/${fileID}`, { recursive: true });
-		} catch (error) {}
+		await fs.rm(`/tmp/${fileID}`, { recursive: true, force: true });
 		await fs.mkdir(`/tmp/${fileID}`);
 		await fs.writeFile(`/tmp/${keys.macrofree.aws}`, freeFile.data);
 		await fs.writeFile(`/tmp/${keys.macroenabled.aws}`, enabledFile.data);
@@ -264,6 +262,14 @@ router.post("/file/:fileid", async (req, res) => {
 
 	//* Swap with current files
 	try {
+		await fs.rm(`../data/out/unzipped/${keys.macrofree.out}`, {
+			recursive: true,
+			force: true,
+		});
+		await fs.rm(`../data/out/unzipped/${keys.macroenabled.out}`, {
+			recursive: true,
+			force: true,
+		});
 		await fs.copyFile(
 			`/tmp/${keys.macrofree.aws}`,
 			`../data/templates/${keys.macrofree.actual}`
@@ -296,9 +302,7 @@ const flushFiles = () => {
 			}
 
 			//* Clean current files (if present)
-			try {
-				await fs.rm(`../data/templates`, { recursive: true });
-			} catch (error) {}
+			await fs.rm(`../data/templates`, { recursive: true, force: true });
 			await fs.mkdir(`../data/templates`, { recursive: true });
 
 			//* Download files from AWS
