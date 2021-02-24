@@ -58,6 +58,7 @@ sequelize
 		app.listen(PORT, async () => {
 			try {
 				await flushFiles();
+				console.log("Files Downloaded");
 			} catch (error) {
 				console.error(error);
 				throw new Error("Something is seriously wrong!");

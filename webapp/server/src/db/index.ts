@@ -131,6 +131,10 @@ const FileAccess = sequelize.define(
 const UserAccess = sequelize.define(
 	"user_access",
 	{
+		userEmail: {
+			type: DataTypes.STRING,
+			primaryKey: true,
+		},
 		type: {
 			type: DataTypes.STRING,
 			primaryKey: true,

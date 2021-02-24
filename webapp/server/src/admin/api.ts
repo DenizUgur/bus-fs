@@ -327,7 +327,7 @@ const flushFiles = () => {
 				}
 			} catch (error) {
 				console.error(error);
-				reject(error);
+				return reject(error);
 			}
 
 			for (const file of files) {
