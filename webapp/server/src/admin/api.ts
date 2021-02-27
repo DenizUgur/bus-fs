@@ -29,7 +29,13 @@ const _cell = (sheet: any) => {
 	};
 	return (column: number, row: number) => {
 		var desired_cell = sheet[`${numToAlpha(column - 1)}${row}`];
-		return desired_cell ? desired_cell.v : undefined;
+		let desired_value = desired_cell ? desired_cell.v : undefined;
+		if (desired_value) {
+			if (typeof desired_value == "string")
+				desired_value = desired_value.trim();
+			return desired_value != "" ? desired_value : undefined;
+		}
+		return undefined;
 	};
 };
 
@@ -66,7 +72,7 @@ router.post("/user", async (req, res) => {
 
 		//* Extract the data
 		let data: Cell[] = [];
-		for (let i = 2; cell(1, i) != undefined; i++) {
+		for (let i = 2; cell(columns.email, i) != undefined; i++) {
 			let user: Cell = {
 				email: cell(columns.email, i),
 				sid: cell(columns.student_id, i),
