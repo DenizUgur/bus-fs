@@ -9,8 +9,9 @@ import redis from "redis";
 import methodOverride from "method-override";
 import session from "express-session";
 import cookieParser from "cookie-parser";
-import * as Tracing from "@sentry/tracing";
 import * as Sentry from "@sentry/node";
+import * as Tracing from "@sentry/tracing";
+import { CaptureConsole } from "@sentry/integrations";
 import { passport } from "./auth";
 import prepareAdmin from "../admin";
 
@@ -27,6 +28,7 @@ if (!dev) {
 		integrations: [
 			new Sentry.Integrations.Http({ tracing: true }),
 			new Tracing.Integrations.Express({ app }),
+			new CaptureConsole({ levels: ["error"] }),
 		],
 		tracesSampleRate: 1.0,
 	});
