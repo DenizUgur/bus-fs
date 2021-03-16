@@ -16,19 +16,29 @@ html
         link(rel="stylesheet" href="/assets/css/index.css")
 
     body
-        div(class="bookshelf_wrapper")
-            ul(class="books_list")
-                li(class="book_item first")
-                li(class="book_item second")
-                li(class="book_item third")
-                li(class="book_item fourth")
-                li(class="book_item fifth")
-                li(class="book_item sixth")
-            div(class="shelf")
-        div(class="message")!=message
+        if ta
+            div(class="ta_wrapper")
+                span(class="ta_names_prompt")="What's your name?"
+                div(class="ta_names")
+                    each val, index in ta_names
+                        if index == valid_index
+                            a(href="/serve/download")=val
+                        else
+                            a=val
+        else
+            div(class="bookshelf_wrapper")
+                ul(class="books_list")
+                    li(class="book_item first")
+                    li(class="book_item second")
+                    li(class="book_item third")
+                    li(class="book_item fourth")
+                    li(class="book_item fifth")
+                    li(class="book_item sixth")
+                div(class="shelf")
+            div(class="message")!=message
         p.
             A service from BUS101 TAs. If there is a problem please #[a(href="mailto:bus101.backoffice@gmail.com") contact] us with #[b screenshot].
         if session
             script(src="/assets/js/session.js")
-        if serve
+        if serve && !ta
             script(src="/assets/js/serve.js")

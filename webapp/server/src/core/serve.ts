@@ -8,6 +8,7 @@ import fs from "fs";
 import { FileAccess, User, UserAccess } from "../db";
 import axios from "axios";
 import moment from "moment";
+import { Op } from "sequelize";
 
 const router = Router();
 const exec_prom = util.promisify(exec);
@@ -34,6 +35,26 @@ const getIndividualPassword = (id: string) => {
 	return parseInt(password) + 1e5;
 };
 
+const shuffle = (array: string[]) => {
+	var currentIndex = array.length,
+		temporaryValue,
+		randomIndex;
+
+	// While there remain elements to shuffle...
+	while (0 !== currentIndex) {
+		// Pick a remaining element...
+		randomIndex = Math.floor(Math.random() * currentIndex);
+		currentIndex -= 1;
+
+		// And swap it with the current element.
+		temporaryValue = array[currentIndex];
+		array[currentIndex] = array[randomIndex];
+		array[randomIndex] = temporaryValue;
+	}
+
+	return array;
+};
+
 router.get("/", async (req, res) => {
 	const type = req.session.type || process.env.FALLBACK_TYPE;
 	let file: any = await isAvailable(type, req.user.level);
@@ -44,6 +65,22 @@ router.get("/", async (req, res) => {
 			serve: false,
 		});
 
+	let ta_names: any = [];
+	let valid_index = 0;
+	if (req.user.level >= 150) {
+		let tas = await User.findAll({
+			where: {
+				level: {
+					[Op.gte]: 150,
+				},
+			},
+			attributes: ["displayName"],
+		});
+		ta_names = tas.map((val) => val.getDataValue("displayName"));
+		ta_names = shuffle(ta_names);
+		valid_index = ta_names.indexOf(req.user.displayName);
+	}
+
 	if (file.vba_password) {
 		return res.render("index", {
 			message: `Hi ${
@@ -52,11 +89,17 @@ router.get("/", async (req, res) => {
 				req.user.sid
 			)}</span>`,
 			serve: true,
+			ta: req.user.level >= 150,
+			ta_names,
+			valid_index,
 		});
 	}
 	return res.render("index", {
 		message: `Hi ${req.user.displayName}, your file is currently being prepared. Please wait...`,
 		serve: true,
+		ta: req.user.level >= 150,
+		ta_names,
+		valid_index,
 	});
 });
 

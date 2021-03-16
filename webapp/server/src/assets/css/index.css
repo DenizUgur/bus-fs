@@ -5,6 +5,50 @@ body {
 	margin: 0;
 }
 
+.ta_wrapper {
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+
+	max-width: 80vw;
+	max-height: 80vh;
+	margin: 0 10vw;
+}
+
+.ta_names {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-wrap: wrap;
+	overflow-y: scroll;
+}
+
+.ta_names a {
+	font-family: "Lato", sans-serif;
+	text-decoration: none;
+	text-align: center;
+	background-color: rgba(255, 255, 255, 0.185);
+	cursor: pointer;
+
+	min-width: 80px;
+	padding: 1.5rem;
+	font-size: 1.5rem;
+	margin: 1rem;
+	border-radius: 1rem;
+
+	box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.2),
+		0 3px 1px -2px rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+.ta_names_prompt {
+	flex-shrink: 1;
+	padding: 5vh;
+	text-align: center;
+	font-family: "Lato", sans-serif;
+	font-size: 2.5rem;
+	color: white;
+}
+
 .bookshelf_wrapper {
 	position: relative;
 	top: 60%;
