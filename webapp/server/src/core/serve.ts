@@ -89,9 +89,6 @@ router.get("/", async (req, res) => {
 				req.user.sid
 			)}</span>`,
 			serve: true,
-			ta: req.user.level >= 150,
-			ta_names,
-			valid_index,
 		});
 	}
 	return res.render("index", {
