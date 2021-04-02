@@ -172,14 +172,19 @@ router.get("/download", async (req, res) => {
 				async (error) => {
 					if (error) throw error;
 
-					const downloadCount = (access?.downloadCount || 0) + 1;
-
-					await UserAccess.upsert({
-						accessed: true,
-						type: type,
-						userEmail: user.dataValues.email,
-						downloadCount,
-					});
+					if (access) {
+						await access.update({
+							accessed: true,
+							downloadCount: (access.downloadCount || 0) + 1,
+						});
+					} else {
+						await UserAccess.create({
+							accessed: true,
+							type: type,
+							userEmail: user.dataValues.email,
+							downloadCount: 1,
+						});
+					}
 					fs.unlinkSync(sourceFile);
 				}
 			);

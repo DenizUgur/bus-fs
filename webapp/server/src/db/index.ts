@@ -136,6 +136,11 @@ const FileAccess = sequelize.define(
 const UserAccess = sequelize.define(
 	"user_access",
 	{
+		id: {
+			type: DataTypes.INTEGER,
+			autoIncrement: true,
+			primaryKey: true,
+		},
 		userEmail: {
 			type: DataTypes.STRING,
 			primaryKey: true,
