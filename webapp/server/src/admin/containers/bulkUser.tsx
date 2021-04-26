@@ -81,8 +81,8 @@ export default function bulkUser(props: any) {
 				<DropArea style={{ flex: 1 }}>
 					<FileDropzone
 						title={`${isTA ? "Assistant" : "Student"} List`}
-						message={`The server will look at the first row for "email", "student_id" ${
-							isTA ? `, and "level"` : ""
+						message={`The server will look at the first row for "email", "student_id"${
+							isTA ? `, "displayName", and "level"` : ""
 						} columns. The cells below these will be used for data input.`}
 						callback={(file: any) => fileHandler(file)}
 					>

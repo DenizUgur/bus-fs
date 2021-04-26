@@ -16,6 +16,7 @@ type Cell = {
 	state: "added" | "deleted" | "modified" | null;
 	email: string;
 	sid: string;
+	displayName: string | undefined;
 	level: number | undefined;
 };
 
@@ -59,7 +60,10 @@ router.post("/user", async (req, res) => {
 			email: null,
 			student_id: null,
 		};
-		if (isTA) columns.level = null;
+		if (isTA) {
+			columns.displayName = null;
+			columns.level = null;
+		}
 
 		for (let i = 1; ; i++) {
 			let column = cell(i, 1);
@@ -77,9 +81,13 @@ router.post("/user", async (req, res) => {
 				email: cell(columns.email, i),
 				sid: cell(columns.student_id, i),
 				state: null,
+				displayName: undefined,
 				level: undefined,
 			};
-			if (isTA) user.level = cell(columns.level, i);
+			if (isTA) {
+				user.displayName = cell(columns.displayName, i);
+				user.level = cell(columns.level, i);
+			}
 			data.push(user);
 		}
 
@@ -90,7 +98,10 @@ router.post("/user", async (req, res) => {
 			let present = prev.find((e: any) => {
 				if (e.dataValues.email == user.email) {
 					user.state =
-						(isTA && e.dataValues.level != user.level) ||
+						(isTA &&
+							(e.dataValues.level != user.level ||
+								e.dataValues.displayName !=
+									user.displayName)) ||
 						e.dataValues.sid != user.sid
 							? "modified"
 							: null;
@@ -116,6 +127,7 @@ router.post("/user", async (req, res) => {
 					email: user.dataValues.email,
 					sid: user.dataValues.sid,
 					level: user.dataValues.level,
+					displayName: user.dataValues.displayName,
 					state: "deleted",
 				});
 		});
@@ -153,6 +165,7 @@ router.post("/user", async (req, res) => {
 							);
 						await _user.update(
 							{
+								displayName: user.displayName,
 								level: user.level,
 								sid: user.sid,
 							},

@@ -25,6 +25,7 @@ export default function UserTable(props: any) {
 				<TableHead>
 					<TableRow>
 						<CustomCell>Email</CustomCell>
+						<CustomCell>Name</CustomCell>
 						<CustomCell>Student ID</CustomCell>
 						<CustomCell>Level</CustomCell>
 					</TableRow>
@@ -40,6 +41,7 @@ export default function UserTable(props: any) {
 									key={el.email}
 								>
 									<CustomCell>{el.email}</CustomCell>
+									<CustomCell>{el.displayName}</CustomCell>
 									<CustomCell>{el.sid}</CustomCell>
 									<CustomCell>{el.level}</CustomCell>
 								</TableRow>
