@@ -198,16 +198,6 @@ router.post("/user", async (req, res) => {
 	}
 });
 
-router.post("/file/flush", async (req, res) => {
-	try {
-		await flushFiles();
-		return res.sendStatus(200);
-	} catch (error) {
-		console.error(error);
-		return res.status(500).send(error);
-	}
-});
-
 router.post("/file/:fileid", async (req, res) => {
 	if (!req.files?.macroenabled || !req.files?.macrofree)
 		return res.status(400).send("Not enough files has been supplied.");

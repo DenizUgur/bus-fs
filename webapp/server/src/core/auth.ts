@@ -183,7 +183,7 @@ const isAuthenticated = async (req: Request, res: Response, next: any) => {
 const isSeniorTA = (req: Request, res: Response, next: any) => {
 	// Save returnTo
 	req.session.returnTo = req.originalUrl;
-	let TA_treshold = 150;
+	let TA_treshold = 200;
 
 	if (dev) {
 		if (req.user.level >= TA_treshold) {

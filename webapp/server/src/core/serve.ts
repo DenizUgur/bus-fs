@@ -127,10 +127,15 @@ router.get("/download", async (req, res) => {
 	);
 
 	if (access?.accessed && file.onetime) {
+		if (file.vba_password) {
+			return res.render("index", {
+				message: `You are not allowed to download more than once.<br><span>Password: ${getIndividualPassword(
+					req.user.sid
+				)}</span>`,
+			});
+		}
 		return res.render("index", {
-			message: `You are not allowed to download more than once.<br><span>Password: ${getIndividualPassword(
-				req.user.sid
-			)}</span>`,
+			message: "You are not allowed to download more than once.",
 		});
 	}
 
