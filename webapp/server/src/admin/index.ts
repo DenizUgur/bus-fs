@@ -16,7 +16,7 @@ import { isAuthenticated, isSeniorTA } from "../core/auth";
 import routerApi from "./api";
 
 const isSuperUser = ({ currentAdmin }: any) => {
-	return currentAdmin && currentAdmin.level == 300;
+	return currentAdmin && currentAdmin.level >= 300;
 };
 
 const isManager = ({ currentAdmin }: any) => {
