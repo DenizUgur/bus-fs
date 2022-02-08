@@ -1,10 +1,10 @@
-# Grab the latest alpine image
-FROM ubuntu:20.10
+# Grab the latest debian image
+FROM debian
 
 # Install python, pip & node, npm
 RUN apt-get update && \
     apt-get install -y curl && \
-    curl -sL https://deb.nodesource.com/setup_15.x | bash - && \
+    curl -sL https://deb.nodesource.com/setup_16.x | bash - && \
     apt-get install -y \
     make gcc g++ git libssl-dev \
     python3 python3-pip nodejs && \
@@ -14,13 +14,16 @@ RUN apt-get update && \
 ADD ./webapp /opt/webapp
 
 # Install dependencies
-RUN cd /opt/webapp/server && npm ci && npm run build
+RUN cd /opt/webapp/server && \
+    npm i -g npm && \
+    npm ci && \
+    npm run build
 RUN mkdir -p /opt/webapp/data/templates
 
 # Build Excel Encryptor
 RUN mkdir -p /opt/encryptor && cd /opt/encryptor && \
-    git clone https://github.com/herumi/cybozulib && \
-    git clone https://github.com/herumi/msoffice
+    git clone https://github.com/DenizUgur/cybozulib && \
+    git clone https://github.com/DenizUgur/msoffice
 
 # Compile the app
 RUN cd /opt/encryptor/msoffice && \

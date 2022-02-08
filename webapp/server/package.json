@@ -9,7 +9,7 @@
 	},
 	"main": "index.js",
 	"engines": {
-		"node": "15.x"
+		"node": "16.x"
 	},
 	"scripts": {
 		"start": "node build/index.js",
