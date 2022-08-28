@@ -11,13 +11,11 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy the application
-ADD ./webapp /opt/webapp
+ADD ./webapp/server/package*.json /opt/webapp/server/
 
 # Install dependencies
 RUN cd /opt/webapp/server && \
-    npm i -g npm && \
-    npm ci && \
-    npm run build
+    npm i -g npm && npm ci
 RUN mkdir -p /opt/webapp/data/templates
 
 # Build Excel Encryptor
@@ -29,6 +27,9 @@ RUN mkdir -p /opt/encryptor && cd /opt/encryptor && \
 RUN cd /opt/encryptor/msoffice && \
     sed -i -e "s/-march=native/-march=ivybridge/g" common.mk && \
     make -j RELEASE=1
+
+# Copy rest of the application
+ADD ./webapp/server/. /opt/webapp/server/
 
 ENV NODE_ENV="production"
 WORKDIR /opt/webapp

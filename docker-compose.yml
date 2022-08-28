@@ -1,0 +1,24 @@
+services:
+  server:
+    build: .
+    env_file:
+      - .env
+    command: npm run --prefix /opt/webapp/server start:build
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - redis
+      - postgres
+  redis:
+    image: redis
+    restart: unless-stopped
+  postgres:
+    image: postgres
+    restart: unless-stopped
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=bus-fs
+      - POSTGRES_PASSWORD=bus-fs
+      - PGDATA=/var/lib/postgresql/data/pgdata
