@@ -1,10 +1,9 @@
 node_modules/
 build/
 utils/
+data/
 webapp/data/out/
 webapp/data/tmp/
 .adminbro/
 seed/
-.prettierrc
 .env
-nodemon.json

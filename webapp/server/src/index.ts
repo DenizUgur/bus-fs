@@ -1,6 +1,13 @@
 /**
  * @author Deniz Ugur <deniz343@gmail.com>
  */
+// Setup env
+const dev = process.env.NODE_ENV !== "production";
+if (dev)
+	require("dotenv").config({
+		path: require("path").join(__dirname, "../../../.env"),
+	});
+
 import app from "./core/server";
 import * as Sentry from "@sentry/node";
 
@@ -13,7 +20,6 @@ import rateLimiterMiddleware from "./core/rateLimiter";
 import sequelize, { FileAccess } from "./db";
 import { flushFiles } from "./admin/api";
 
-const dev = process.env.NODE_ENV !== "production";
 app.use("/auth", routerAuth);
 app.use("/serve", [isAuthenticated, rateLimiterMiddleware, routerServe]);
 
@@ -50,7 +56,7 @@ app.use((err: any, req: any, res: any, next: any) => {
 	});
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 80;
 
 sequelize
 	.sync({ force: process.env.NODE_ENV != "production" })

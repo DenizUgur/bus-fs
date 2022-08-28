@@ -5,7 +5,7 @@ import express from "express";
 import helmet from "helmet";
 import cors from "cors";
 import path from "path";
-import redis from "redis";
+import { createClient } from "redis";
 import methodOverride from "method-override";
 import session from "express-session";
 import cookieParser from "cookie-parser";
@@ -22,7 +22,13 @@ app.set("trust proxy", 1);
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "../views"));
 
-if (!dev) {
+if (process.env.ORIGIN_HOST == undefined)
+	throw new Error("ORIGIN_HOST is not available");
+
+if (process.env.SENTRY_DSN == undefined)
+	console.warn("SENTRY_DSN is not available");
+
+if (!dev && process.env.SENTRY_DSN) {
 	Sentry.init({
 		dsn: process.env.SENTRY_DSN,
 		integrations: [
@@ -41,7 +47,7 @@ app.use("/assets", express.static(path.join(__dirname, "../assets")));
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(
 	cors({
-		origin: dev ? "*" : "https://bus-fs.herokuapp.com/",
+		origin: dev ? "*" : process.env.ORIGIN_HOST,
 		credentials: true,
 		allowedHeaders: "Content-Type, Set-Cookie, Authorization",
 	})
@@ -64,7 +70,12 @@ if (dev) {
 	);
 } else {
 	const RedisStore = require("connect-redis")(session);
-	const redisClient = redis.createClient(process.env.REDIS_URL || "");
+	const redisClient = createClient({
+		url: process.env.REDIS_URL || "",
+		legacyMode: true,
+	});
+	redisClient.connect().catch(console.error);
+
 	app.use(
 		session({
 			store: new RedisStore({ client: redisClient, ttl: 1000 * 60 * 15 }),
