@@ -2,14 +2,23 @@
  * @author Deniz Ugur <deniz343@gmail.com>
  */
 import { Sequelize, DataTypes } from "sequelize";
+import path from "path";
 import { aws_delete } from "../core/aws";
-const dev = process.env.NODE_ENV !== "production";
+
+const pkg = (<any>process).pkg ? true : false;
+const dev = pkg ? false : process.env.NODE_ENV !== "production";
 
 let sequelize: Sequelize;
 if (!dev) {
-	if (process.env.DATABASE_URL == undefined) {
-		throw new Error("DATABASE_URL is not available");
+	if (pkg) {
+		sequelize = new Sequelize({
+			dialect: "sqlite",
+			storage: path.join(process.cwd(), "db", "db.sqlite"),
+		});
 	} else {
+		if (process.env.DATABASE_URL == undefined)
+			throw new Error("DATABASE_URL is not available");
+
 		sequelize = new Sequelize(process.env.DATABASE_URL, {
 			dialect: "postgres",
 			dialectOptions: {
@@ -70,7 +79,7 @@ const User = sequelize.define(
 			defaultValue: 0,
 		},
 		privileges: {
-			type: DataTypes.ARRAY(DataTypes.STRING),
+			type: DataTypes.JSON,
 			defaultValue: [],
 		},
 	},
@@ -135,8 +144,8 @@ const UserAccess = sequelize.define(
 	"user_access",
 	{
 		id: {
-			type: DataTypes.INTEGER,
-			autoIncrement: true,
+			type: DataTypes.UUID,
+			defaultValue: DataTypes.UUIDV4,
 			primaryKey: true,
 		},
 		userEmail: {

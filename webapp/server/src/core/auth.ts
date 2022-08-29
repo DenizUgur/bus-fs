@@ -7,7 +7,8 @@ import { User } from "../db";
 const passport = require("passport");
 const config = require("../config");
 
-const dev = process.env.NODE_ENV !== "production";
+const pkg = (<any>process).pkg ? true : false;
+const dev = pkg ? false : process.env.NODE_ENV !== "production";
 const router = Router();
 
 passport.serializeUser((user: any, done: any) => {

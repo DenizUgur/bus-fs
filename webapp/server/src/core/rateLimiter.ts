@@ -14,7 +14,8 @@ const opts = {
 	clearExpiredByTimeout: true,
 };
 
-const dev = process.env.NODE_ENV !== "production";
+const pkg = (<any>process).pkg ? true : false;
+const dev = pkg ? false : process.env.NODE_ENV !== "production";
 const rateLimiterDefault = new RateLimiterPostgres(opts);
 
 const rateLimiterMiddleware = (req: any, res: any, next: any) => {

@@ -10,6 +10,9 @@ import axios from "axios";
 import moment from "moment";
 import { Op } from "sequelize";
 
+if (process.env.FALLBACK_TYPE == undefined)
+	throw new Error("FALLBACK_TYPE is not available");
+
 const router = Router();
 const exec_prom = util.promisify(exec);
 
@@ -103,6 +106,9 @@ router.get("/", async (req, res) => {
 router.get("/download", async (req, res) => {
 	const type = req.session.type || process.env.FALLBACK_TYPE;
 	let file: any = await isAvailable(type, req.user.level);
+
+	//* File has been served, we don't need a session anymore
+	delete req.session;
 
 	if (!file.enabled)
 		return res.render("index", {

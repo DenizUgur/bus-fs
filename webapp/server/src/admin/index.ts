@@ -2,6 +2,7 @@
  * @author Deniz Ugur <deniz343@gmail.com>
  */
 import express from "express";
+import path from "path";
 import AdminBro, {
 	ActionResponse,
 	AdminBroOptions,
@@ -130,12 +131,16 @@ const options: AdminBroOptions = {
 					updateStudents: {
 						actionType: "resource",
 						isAccessible: isManager,
-						component: AdminBro.bundle("./containers/bulkUser"),
+						component: AdminBro.bundle(
+							path.join(__dirname, "./containers/bulkUser")
+						),
 					},
 					updateAssistants: {
 						actionType: "resource",
 						isAccessible: isManager,
-						component: AdminBro.bundle("./containers/bulkUser"),
+						component: AdminBro.bundle(
+							path.join(__dirname, "./containers/bulkUser")
+						),
 					},
 				},
 			},
@@ -194,7 +199,9 @@ const options: AdminBroOptions = {
 								record: data.record.toJSON(data.currentAdmin),
 							};
 						},
-						component: AdminBro.bundle("./containers/fileUpload"),
+						component: AdminBro.bundle(
+							path.join(__dirname, "./containers/fileUpload")
+						),
 					},
 				},
 			},
@@ -202,7 +209,9 @@ const options: AdminBroOptions = {
 	],
 	pages: {
 		Documentation: {
-			component: AdminBro.bundle("./containers/documentation"),
+			component: AdminBro.bundle(
+				path.join(__dirname, "./containers/documentation")
+			),
 		},
 	},
 	rootPath: "/manage",

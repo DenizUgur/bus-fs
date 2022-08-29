@@ -2,9 +2,14 @@
  * @author Deniz Ugur <deniz343@gmail.com>
  */
 import AWS from "aws-sdk";
-import fs from "fs";
 
-const dev = process.env.NODE_ENV !== "production";
+if (
+	process.env.AWS_ACCESS_KEY_ID == undefined ||
+	process.env.AWS_SECRET_ACCESS_KEY == undefined ||
+	process.env.S3_BUCKET_NAME == undefined
+)
+	throw new Error("AWS credentials are not complete");
+
 AWS.config.update({ region: "eu-central-1" });
 
 const s3 = new AWS.S3();

@@ -2,6 +2,7 @@ node_modules/
 build/
 utils/
 data/
+dist/
 webapp/data/out/
 webapp/data/tmp/
 .adminbro/

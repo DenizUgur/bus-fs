@@ -15,12 +15,14 @@ import { CaptureConsole } from "@sentry/integrations";
 import { passport } from "./auth";
 import prepareAdmin from "../admin";
 
-const dev = process.env.NODE_ENV !== "production";
+const pkg = (<any>process).pkg ? true : false;
+const dev = pkg ? false : process.env.NODE_ENV !== "production";
 
 const app: express.Application = express();
 app.set("trust proxy", 1);
 app.set("view engine", "pug");
-app.set("views", path.join(__dirname, "../views"));
+
+app.set("views", path.join(__dirname, pkg ? "../../src/views" : "../views"));
 
 if (process.env.ORIGIN_HOST == undefined)
 	throw new Error("ORIGIN_HOST is not available");
@@ -42,7 +44,10 @@ if (!dev && process.env.SENTRY_DSN) {
 	app.use(Sentry.Handlers.tracingHandler());
 }
 
-app.use("/assets", express.static(path.join(__dirname, "../assets")));
+app.use(
+	"/assets",
+	express.static(path.join(__dirname, pkg ? "../../src/assets" : "../assets"))
+);
 
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(
@@ -56,11 +61,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride());
 app.use(cookieParser());
 
-if (dev) {
+if (process.env.SESSION_KEY == undefined)
+	throw new Error("SESSION_KEY is not available");
+
+if (dev || pkg) {
 	app.use(
 		session({
-			secret: process.env.SESSION_KEY || "",
+			secret: process.env.SESSION_KEY,
 			resave: false,
+			unset: "destroy",
 			saveUninitialized: false,
 			cookie: {
 				secure: false,
@@ -69,9 +78,12 @@ if (dev) {
 		})
 	);
 } else {
+	if (process.env.REDIS_URL == undefined)
+		throw new Error("REDIS_URL is not available");
+
 	const RedisStore = require("connect-redis")(session);
 	const redisClient = createClient({
-		url: process.env.REDIS_URL || "",
+		url: process.env.REDIS_URL,
 		legacyMode: true,
 	});
 	redisClient.connect().catch(console.error);
@@ -79,7 +91,7 @@ if (dev) {
 	app.use(
 		session({
 			store: new RedisStore({ client: redisClient, ttl: 1000 * 60 * 15 }),
-			secret: process.env.SESSION_KEY || "",
+			secret: process.env.SESSION_KEY,
 			resave: false,
 			saveUninitialized: false,
 			cookie: {

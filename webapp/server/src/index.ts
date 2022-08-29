@@ -2,11 +2,20 @@
  * @author Deniz Ugur <deniz343@gmail.com>
  */
 // Setup env
-const dev = process.env.NODE_ENV !== "production";
+const pkg = (<any>process).pkg ? true : false;
+const dev = pkg ? false : process.env.NODE_ENV !== "production";
+
 if (dev)
 	require("dotenv").config({
 		path: require("path").join(__dirname, "../../../.env"),
 	});
+
+if (pkg) {
+	require("dotenv").config({
+		path: require("path").join(process.cwd(), ".env"),
+	});
+	process.env.NODE_ENV = "production";
+}
 
 import app from "./core/server";
 import * as Sentry from "@sentry/node";
