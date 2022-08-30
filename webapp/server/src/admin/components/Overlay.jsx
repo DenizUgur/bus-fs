@@ -26,7 +26,7 @@ const ProgressOverlay = styled.div`
     }
 `;
 
-export default function Overlay(props: any) {
+export default function Overlay(props) {
 	const { children, text, enable } = props;
 	return (
 		<>

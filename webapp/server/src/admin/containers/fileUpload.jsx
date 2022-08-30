@@ -3,7 +3,7 @@
  */
 import React, { useState, useRef } from "react";
 import { FileDropzone } from "./Dropzone";
-import { useNotice } from "admin-bro";
+import { useNotice } from "adminjs";
 import {
 	SubmitButton,
 	SubmitContainer,
@@ -12,10 +12,10 @@ import {
 } from "../components/styles";
 import Overlay from "../components/Overlay";
 
-export default function fileUpload(props: any) {
+export default function fileUpload(props) {
 	const fileID = props.record.id;
 	const sendNotice = useNotice();
-	const submitRef = useRef<any>(null);
+	const submitRef = useRef(null);
 	const [loading, setLoading] = useState(false);
 	const [state, setState] = useState({
 		macro_free: undefined,
@@ -23,8 +23,8 @@ export default function fileUpload(props: any) {
 		valid: false,
 	});
 
-	const fileHandler = (origin: string, file: any) => {
-		let newState: any = Object.assign({}, state);
+	const fileHandler = (origin, file) => {
+		let newState = Object.assign({}, state);
 		newState[origin] = file;
 		newState.valid =
 			newState.macro_enabled != undefined &&
@@ -36,7 +36,7 @@ export default function fileUpload(props: any) {
 		setLoading(true);
 		submitRef.current.disabled = true;
 
-		let form: any = new FormData();
+		let form = new FormData();
 		form.append("macrofree", state.macro_free);
 		form.append("macroenabled", state.macro_enabled);
 		fetch(`/api/file/${fileID}`, {
@@ -68,14 +68,14 @@ export default function fileUpload(props: any) {
 					<FileDropzone
 						title="Macro-enabled File"
 						macro={true}
-						callback={(file: any) =>
+						callback={(file) =>
 							fileHandler("macro_enabled", file)
 						}
 					/>
 					<FileDropzone
 						title="Macro-free File"
 						macro={false}
-						callback={(file: any) =>
+						callback={(file) =>
 							fileHandler("macro_free", file)
 						}
 					/>

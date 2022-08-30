@@ -2,7 +2,6 @@
  * @author Deniz Ugur <deniz343@gmail.com>
  */
 import express from "express";
-import helmet from "helmet";
 import cors from "cors";
 import path from "path";
 import { createClient } from "redis";
@@ -16,7 +15,7 @@ import { passport } from "./auth";
 import prepareAdmin from "../admin";
 
 const pkg = (<any>process).pkg ? true : false;
-const dev = pkg ? false : process.env.NODE_ENV !== "production";
+const dev = process.env.NODE_ENV !== "production";
 
 const app: express.Application = express();
 app.set("trust proxy", 1);
@@ -49,7 +48,7 @@ app.use(
 	express.static(path.join(__dirname, pkg ? "../../src/assets" : "../assets"))
 );
 
-app.use(helmet({ contentSecurityPolicy: false }));
+app.use(require("helmet")({ contentSecurityPolicy: false }));
 app.use(
 	cors({
 		origin: dev ? "*" : process.env.ORIGIN_HOST,

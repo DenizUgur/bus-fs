@@ -4,10 +4,14 @@
 import { Router } from "express";
 import FileUpload from "express-fileupload";
 import xlsx from "xlsx";
-import { nanoid } from "nanoid";
 import sequelize, { FileAccess, User } from "../db";
 import { promises as fs } from "fs";
 import { aws_delete, aws_download, aws_upload } from "../core/aws";
+
+const { nanoid } = require("nanoid");
+
+const pkg = (<any>process).pkg ? true : false;
+const dev = pkg ? false : process.env.NODE_ENV !== "production";
 
 const router = Router();
 router.use(FileUpload());
@@ -271,21 +275,21 @@ router.post("/file/:fileid", async (req, res) => {
 
 	//* Swap with current files
 	try {
-		await fs.rm(`../data/out/unzipped/${keys.macrofree.out}`, {
+		await fs.rm(`./data/out/unzipped/${keys.macrofree.out}`, {
 			recursive: true,
 			force: true,
 		});
-		await fs.rm(`../data/out/unzipped/${keys.macroenabled.out}`, {
+		await fs.rm(`./data/out/unzipped/${keys.macroenabled.out}`, {
 			recursive: true,
 			force: true,
 		});
 		await fs.copyFile(
 			`/tmp/${keys.macrofree.aws}`,
-			`../data/templates/${keys.macrofree.actual}`
+			`./data/templates/${keys.macrofree.actual}`
 		);
 		await fs.copyFile(
 			`/tmp/${keys.macroenabled.aws}`,
-			`../data/templates/${keys.macroenabled.actual}`
+			`./data/templates/${keys.macroenabled.actual}`
 		);
 	} catch (error) {
 		return await rollback(error, false);
@@ -302,7 +306,6 @@ const flushFiles = () => {
 		await sequelize.transaction(async (transaction) => {
 			//* Disable access to files
 			const files = await FileAccess.findAll({ transaction });
-			if (files?.length == 0) return resolve("No files on database");
 
 			let prev: any = {};
 			for (const file of files) {
@@ -311,8 +314,8 @@ const flushFiles = () => {
 			}
 
 			//* Clean current files (if present)
-			await fs.rm(`../data/templates`, { recursive: true, force: true });
-			await fs.mkdir(`../data/templates`, { recursive: true });
+			await fs.rm(`./data/templates`, { recursive: true, force: true });
+			await fs.mkdir(`./data/templates`, { recursive: true });
 
 			//* Download files from AWS
 			try {
@@ -322,7 +325,7 @@ const flushFiles = () => {
 
 					if (response.error) throw new Error(response.error);
 					await fs.writeFile(
-						`../data/templates/${keys.macrofree.actual}`,
+						`./data/templates/${keys.macrofree.actual}`,
 						response.file
 					);
 
@@ -330,7 +333,7 @@ const flushFiles = () => {
 
 					if (response.error) throw new Error(response.error);
 					await fs.writeFile(
-						`../data/templates/${keys.macroenabled.actual}`,
+						`./data/templates/${keys.macroenabled.actual}`,
 						response.file
 					);
 				}

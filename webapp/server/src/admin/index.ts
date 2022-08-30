@@ -3,15 +3,9 @@
  */
 import express from "express";
 import path from "path";
-import AdminBro, {
-	ActionResponse,
-	AdminBroOptions,
-	After,
-	NotFoundError,
-	RecordJSON,
-} from "admin-bro";
-import AdminBroExpress from "@admin-bro/express";
-import AdminBroSequelize from "@admin-bro/sequelize";
+import AdminJS, { AdminJSOptions, NotFoundError } from "adminjs";
+import AdminJSExpress from "@adminjs/express";
+import AdminJSSequelize from "@adminjs/sequelize";
 import { FileAccess, User, UserAccess } from "../db";
 import { isAuthenticated, isSeniorTA } from "../core/auth";
 import routerApi from "./api";
@@ -116,7 +110,7 @@ const LSEProperties = (
 	};
 };
 
-const options: AdminBroOptions = {
+const options: AdminJSOptions = {
 	resources: [
 		{
 			resource: User,
@@ -131,16 +125,12 @@ const options: AdminBroOptions = {
 					updateStudents: {
 						actionType: "resource",
 						isAccessible: isManager,
-						component: AdminBro.bundle(
-							path.join(__dirname, "./containers/bulkUser")
-						),
+						component: AdminJS.bundle("./containers/bulkUser"),
 					},
 					updateAssistants: {
 						actionType: "resource",
 						isAccessible: isManager,
-						component: AdminBro.bundle(
-							path.join(__dirname, "./containers/bulkUser")
-						),
+						component: AdminJS.bundle("./containers/bulkUser"),
 					},
 				},
 			},
@@ -199,9 +189,7 @@ const options: AdminBroOptions = {
 								record: data.record.toJSON(data.currentAdmin),
 							};
 						},
-						component: AdminBro.bundle(
-							path.join(__dirname, "./containers/fileUpload")
-						),
+						component: AdminJS.bundle("./containers/fileUpload"),
 					},
 				},
 			},
@@ -209,9 +197,7 @@ const options: AdminBroOptions = {
 	],
 	pages: {
 		Documentation: {
-			component: AdminBro.bundle(
-				path.join(__dirname, "./containers/documentation")
-			),
+			component: AdminJS.bundle("./containers/documentation"),
 		},
 	},
 	rootPath: "/manage",
@@ -220,13 +206,13 @@ const options: AdminBroOptions = {
 	},
 };
 
-AdminBro.registerAdapter(AdminBroSequelize);
-const adminBro = new AdminBro(options);
-const adminRouter = AdminBroExpress.buildRouter(adminBro);
+AdminJS.registerAdapter(AdminJSSequelize);
+const adminJS = new AdminJS(options);
+const adminRouter = AdminJSExpress.buildRouter(adminJS);
 
 const prepareAdmin = (app: express.Application) => {
 	app.use("/api", [isAuthenticated, isSeniorTA, routerApi]);
-	app.use(adminBro.options.rootPath, [
+	app.use(adminJS.options.rootPath, [
 		isAuthenticated,
 		isSeniorTA,
 		adminRouter,

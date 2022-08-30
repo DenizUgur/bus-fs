@@ -14,11 +14,13 @@ if (pkg) {
 	require("dotenv").config({
 		path: require("path").join(process.cwd(), ".env"),
 	});
-	process.env.NODE_ENV = "production";
+	if (process.env.NODE_ENV == undefined) process.env.NODE_ENV = "production";
 }
 
 import app from "./core/server";
 import * as Sentry from "@sentry/node";
+import fs from "fs";
+import path from "path";
 
 //////////////////////////
 //		APP START		//
@@ -74,6 +76,21 @@ sequelize
 			try {
 				await flushFiles();
 				console.log("Files Downloaded");
+
+				if (pkg && !fs.existsSync("./data/worker")) {
+					await fs.promises.mkdir("./data/worker", {
+						recursive: true,
+					});
+					await fs.promises.copyFile(
+						path.join(__dirname, "../../worker/app.py"),
+						"./data/worker/app.py"
+					);
+					await fs.promises.copyFile(
+						path.join(__dirname, "../../worker/encryptor"),
+						"./data/worker/encryptor"
+					);
+					await fs.promises.chmod("./data/worker/encryptor", 0o555);
+				}
 			} catch (error) {
 				console.error(error);
 				throw new Error("Something is seriously wrong!");

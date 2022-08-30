@@ -2,7 +2,7 @@
  * @author Deniz Ugur <deniz343@gmail.com>
  */
 import React, { useMemo, useState, useEffect } from "react";
-import { useNotice } from "admin-bro";
+import { useNotice } from "adminjs";
 import { useDropzone } from "react-dropzone";
 import { File } from "../components/styles";
 import { DropZoneParent } from "../components/styles";
@@ -11,7 +11,7 @@ const baseStyle = {
 	flex: 1,
 	display: "flex",
 	justifyContent: "center",
-	flexDirection: "column" as const,
+	flexDirection: "column",
 	alignItems: "center",
 	padding: "20px",
 	borderWidth: 2,
@@ -35,7 +35,7 @@ const rejectStyle = {
 	borderColor: "#ff1744",
 };
 
-export const FileDropzone = (props: any) => {
+export const FileDropzone = (props) => {
 	const { title, message, callback, macro, children } = props;
 	return (
 		<DropZoneParent>
@@ -54,12 +54,12 @@ export const FileDropzone = (props: any) => {
 	);
 };
 
-export const StyledDropzone = (props: any) => {
+export const StyledDropzone = (props) => {
 	const { fileCallback, macro } = props;
 	const sendNotice = useNotice();
-	const [file, setFile] = useState<any[]>([]);
+	const [file, setFile] = useState([]);
 
-	const handleDrop = (file: any) => {
+	const handleDrop = (file) => {
 		if (
 			(macro && file[0].name.includes(".xlsm")) ||
 			(!macro && file[0].name.includes(".xlsx"))

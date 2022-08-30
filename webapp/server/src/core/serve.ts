@@ -13,6 +13,8 @@ import { Op } from "sequelize";
 if (process.env.FALLBACK_TYPE == undefined)
 	throw new Error("FALLBACK_TYPE is not available");
 
+const pkg = (<any>process).pkg ? true : false;
+
 const router = Router();
 const exec_prom = util.promisify(exec);
 
@@ -163,7 +165,7 @@ router.get("/download", async (req, res) => {
 	const extension = access?.macrofree ? "xlsx" : "xlsm";
 
 	exec_prom(
-		`python3 ../worker/app.py ${[
+		`python3 ${pkg ? "./data/worker/app.py" : "../worker/app.py"} ${[
 			type,
 			req.user.sid,
 			extension,
@@ -174,7 +176,7 @@ router.get("/download", async (req, res) => {
 		].join(" ")}`
 	)
 		.then(() => {
-			const sourceFile = `../data/out/${req.user.sid}_${type}${
+			const sourceFile = `./data/out/${req.user.sid}_${type}${
 				encrypt ? "_enc" : ""
 			}.${extension}`;
 			res.download(

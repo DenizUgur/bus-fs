@@ -8,3 +8,4 @@ webapp/data/tmp/
 .adminbro/
 seed/
 .env
+encryptor

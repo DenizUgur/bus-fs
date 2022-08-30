@@ -1,7 +1,7 @@
 /**
  * @author Deniz Ugur <deniz343@gmail.com>
  */
-import { ButtonCSS } from "@admin-bro/design-system";
+import { ButtonCSS } from "@adminjs/design-system";
 import styled from "styled-components";
 
 export const SubmitButton = styled.button`

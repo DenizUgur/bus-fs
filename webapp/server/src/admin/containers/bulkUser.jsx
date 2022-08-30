@@ -10,10 +10,10 @@ import {
 	UpdateArea,
 } from "../components/styles";
 import UserTable from "../components/UserTable";
-import { useNotice } from "admin-bro";
+import { useNotice } from "adminjs";
 import Overlay from "../components/Overlay";
 
-export default function bulkUser(props: any) {
+export default function bulkUser(props) {
 	const isTA = props.action.name === "updateAssistants";
 	const [loading, setLoading] = useState(false);
 	const [state, setState] = useState({
@@ -21,22 +21,22 @@ export default function bulkUser(props: any) {
 		file: null,
 	});
 	const sendNotice = useNotice();
-	const verifyRef = useRef<any>(null);
-	const submitRef = useRef<any>(null);
+	const verifyRef = useRef(null);
+	const submitRef = useRef(null);
 
-	const fileHandler = (file: any) => {
-		let newState: any = Object.assign({}, state);
+	const fileHandler = (file) => {
+		let newState = Object.assign({}, state);
 		newState.file = file;
 		setState(newState);
 	};
 
-	const apiHandle = (dry: boolean) => {
+	const apiHandle = (dry) => {
 		setLoading(true);
 		verifyRef.current.disabled = true;
 		submitRef.current.disabled = true;
 
 		if (state.file) {
-			let form: any = new FormData();
+			let form = new FormData();
 			form.append("file", state.file);
 			fetch(`/api/user?ta=${isTA}&dry=${dry}`, {
 				method: "POST",
@@ -57,7 +57,7 @@ export default function bulkUser(props: any) {
 					});
 					if (dry) submitRef.current.disabled = false;
 
-					let newState: any = Object.assign({}, state);
+					let newState = Object.assign({}, state);
 					newState.response = await res.json();
 
 					setState(newState);
@@ -84,7 +84,7 @@ export default function bulkUser(props: any) {
 						message={`The server will look at the first row for "email", "student_id"${
 							isTA ? `, "displayName", and "level"` : ""
 						} columns. The cells below these will be used for data input.`}
-						callback={(file: any) => fileHandler(file)}
+						callback={(file) => fileHandler(file)}
 					>
 						<SubmitContainer>
 							<SubmitButton

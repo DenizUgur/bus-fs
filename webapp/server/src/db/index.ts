@@ -6,14 +6,14 @@ import path from "path";
 import { aws_delete } from "../core/aws";
 
 const pkg = (<any>process).pkg ? true : false;
-const dev = pkg ? false : process.env.NODE_ENV !== "production";
+const dev = process.env.NODE_ENV !== "production";
 
 let sequelize: Sequelize;
 if (!dev) {
 	if (pkg) {
 		sequelize = new Sequelize({
 			dialect: "sqlite",
-			storage: path.join(process.cwd(), "db", "db.sqlite"),
+			storage: path.join(process.cwd(), "data", "db.sqlite"),
 		});
 	} else {
 		if (process.env.DATABASE_URL == undefined)

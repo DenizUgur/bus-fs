@@ -16,7 +16,7 @@ ADD ./webapp/server/package*.json /opt/webapp/server/
 # Install dependencies
 RUN cd /opt/webapp/server && \
     npm i -g npm && npm ci
-RUN mkdir -p /opt/webapp/data/templates
+RUN mkdir -p /opt/webapp/server/data/templates
 
 # Build Excel Encryptor
 RUN mkdir -p /opt/encryptor && cd /opt/encryptor && \
@@ -25,7 +25,7 @@ RUN mkdir -p /opt/encryptor && cd /opt/encryptor && \
 
 # Compile the app
 RUN cd /opt/encryptor/msoffice && \
-    sed -i -e "s/-march=native/-march=ivybridge/g" common.mk && \
+    sed -i -e "s/-march=native/-march=x86-64/g" common.mk && \
     make -j RELEASE=1
 
 # Copy rest of the application

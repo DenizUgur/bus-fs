@@ -7,11 +7,10 @@ import {
 	TableRow,
 	TableHead,
 	TableBody,
-} from "@admin-bro/design-system";
-import { TableContainer, CustomCell } from "../components/styles";
-import { Cell } from "../api";
+} from "@adminjs/design-system";
+import { TableContainer, CustomCell } from "./styles";
 
-export default function UserTable(props: any) {
+export default function UserTable(props) {
 	const { data } = props;
 	const colors = {
 		added: "#59886b",
@@ -31,7 +30,7 @@ export default function UserTable(props: any) {
 					</TableRow>
 				</TableHead>
 				<TableBody>
-					{data.map((el: Cell) => {
+					{data.map((el) => {
 						return (
 							el.state && (
 								<TableRow
