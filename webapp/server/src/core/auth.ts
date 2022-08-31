@@ -4,8 +4,17 @@
 import { Request, Response, Router } from "express";
 import { OIDCStrategy } from "passport-azure-ad";
 import { User } from "../db";
+import fs from "fs";
+import path from "path";
+
 const passport = require("passport");
-const config = require("../config");
+
+const pkg = (<any>process).pkg ? true : false;
+
+const config_path = pkg
+	? path.join(process.cwd(), "./data/auth.json")
+	: path.join(__dirname, "../data/auth.json");
+const config = JSON.parse(fs.readFileSync(config_path, "utf8"));
 
 const dev = process.env.NODE_ENV !== "production";
 const router = Router();
@@ -42,26 +51,7 @@ const findByOid = async (oid: any, fn: any) => {
 
 passport.use(
 	new OIDCStrategy(
-		{
-			identityMetadata: config.creds.identityMetadata,
-			clientID: config.creds.clientID,
-			responseType: config.creds.responseType,
-			responseMode: config.creds.responseMode,
-			redirectUrl: config.creds.redirectUrl,
-			allowHttpForRedirectUrl: config.creds.allowHttpForRedirectUrl,
-			clientSecret: config.creds.clientSecret,
-			validateIssuer: config.creds.validateIssuer,
-			isB2C: config.creds.isB2C,
-			issuer: config.creds.issuer,
-			passReqToCallback: config.creds.passReqToCallback,
-			scope: config.creds.scope,
-			loggingLevel: config.creds.loggingLevel,
-			nonceLifetime: config.creds.nonceLifetime,
-			nonceMaxAmount: config.creds.nonceMaxAmount,
-			useCookieInsteadOfSession: config.creds.useCookieInsteadOfSession,
-			cookieEncryptionKeys: config.creds.cookieEncryptionKeys,
-			clockSkew: config.creds.clockSkew,
-		},
+		config,
 		async (
 			iss: any,
 			sub: any,

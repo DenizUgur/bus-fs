@@ -1,6 +1,9 @@
 /**
  * @author Deniz Ugur <deniz343@gmail.com>
  */
+import fs from "fs";
+import path from "path";
+
 // Setup env
 const pkg = (<any>process).pkg ? true : false;
 const dev = pkg ? false : process.env.NODE_ENV !== "production";
@@ -15,12 +18,53 @@ if (pkg) {
 		path: require("path").join(process.cwd(), ".env"),
 	});
 	if (process.env.NODE_ENV == undefined) process.env.NODE_ENV = "production";
+	process.env.ADMIN_JS_TMP_DIR = "./data/.adminjs";
+}
+
+//* Prepare data folder
+//* Copy worker files to data folder
+if (!fs.existsSync("./data/worker")) {
+	try {
+		fs.mkdirSync("./data/worker", {
+			recursive: true,
+		});
+		fs.copyFileSync(
+			path.join(__dirname, "../../worker/app.py"),
+			"./data/worker/app.py"
+		);
+		fs.copyFileSync(
+			path.join(__dirname, "../../worker/encryptor"),
+			"./data/worker/encryptor"
+		);
+		fs.chmodSync("./data/worker/encryptor", 0o555);
+	} catch (error) {
+		throw new Error("worker files could not be copied");
+	}
+}
+
+//* Copy credentials to data folder
+if (!fs.existsSync("./data/ssl")) {
+	try {
+		fs.mkdirSync("./data/ssl", { recursive: true });
+		fs.copyFileSync("./cert.pem", "./data/ssl/cert.pem");
+		fs.copyFileSync("./key.pem", "./data/ssl/key.pem");
+	} catch (err) {
+		throw new Error("SSL key/cert pair not found");
+	}
+}
+
+//* Copy auth configuraton to data folder
+if (!fs.existsSync("./data/auth.json")) {
+	try {
+		fs.copyFileSync("./auth.json", "./data/auth.json");
+	} catch (err) {
+		throw new Error("auth.json not found");
+	}
 }
 
 import app from "./core/server";
 import * as Sentry from "@sentry/node";
-import fs from "fs";
-import path from "path";
+import https from "https";
 
 //////////////////////////
 //		APP START		//
@@ -67,34 +111,33 @@ app.use((err: any, req: any, res: any, next: any) => {
 	});
 });
 
-const PORT = process.env.PORT || 80;
+const PORT_HTTP = process.env.PORT_HTTP || 80;
+const PORT_HTTPS = process.env.PORT_HTTPS || 443;
 
 sequelize
 	.sync({ force: process.env.NODE_ENV != "production" })
 	.then(async () => {
-		app.listen(PORT, async () => {
-			try {
-				await flushFiles();
-				console.log("Files Downloaded");
+		try {
+			await flushFiles();
+			console.log("Files Downloaded");
+		} catch (error) {
+			console.error(error);
+			throw new Error("Something is seriously wrong!");
+		}
 
-				if (pkg && !fs.existsSync("./data/worker")) {
-					await fs.promises.mkdir("./data/worker", {
-						recursive: true,
-					});
-					await fs.promises.copyFile(
-						path.join(__dirname, "../../worker/app.py"),
-						"./data/worker/app.py"
-					);
-					await fs.promises.copyFile(
-						path.join(__dirname, "../../worker/encryptor"),
-						"./data/worker/encryptor"
-					);
-					await fs.promises.chmod("./data/worker/encryptor", 0o555);
-				}
-			} catch (error) {
-				console.error(error);
-				throw new Error("Something is seriously wrong!");
-			}
-			console.log(`Listening on ${PORT}`);
-		});
+		//* Start the servers
+		app.listen(PORT_HTTP, () =>
+			console.log(`Listening HTTP server on ${PORT_HTTP}`)
+		);
+		https
+			.createServer(
+				{
+					key: fs.readFileSync("./data/ssl/key.pem"),
+					cert: fs.readFileSync("./data/ssl/cert.pem"),
+				},
+				app
+			)
+			.listen(PORT_HTTPS, () =>
+				console.log(`Listening HTTPS server on ${PORT_HTTPS}`)
+			);
 	});

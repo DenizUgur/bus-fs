@@ -18,7 +18,7 @@
 		"prepack": "cd ../worker && sh compile_encryptor.sh && cd - && npm run build",
 		"pack": "pkg -C GZip .",
 		"build": "rimraf ./build && tsc && npm run copy:static",
-		"copy:static": "cp -r ./src/admin/containers ./src/admin/components ./build/admin && cp -r ./src/views ./src/assets ./src/config ./build"
+		"copy:static": "cp -r ./src/admin/containers ./src/admin/components ./build/admin && cp -r ./src/views ./src/assets ./build"
 	},
 	"license": "ISC",
 	"dependencies": {
@@ -40,6 +40,7 @@
 		"express-formidable": "^1.2.0",
 		"express-session": "^1.17.3",
 		"helmet": "^6.0.0",
+		"https": "^1.0.0",
 		"method-override": "^3.0.0",
 		"moment": "^2.29.4",
 		"nanoid": "^3.3.4",
@@ -82,7 +83,7 @@
 			"./build/admin/**/*.jsx"
 		],
 		"scripts": [
-			"./node_modules/adminjs/node_modules/@adminjs/design-system/bundle.development.js"
+			"./node_modules/@adminjs/design-system/bundle.development.js"
 		],
 		"targets": [
 			"node16-macos",
