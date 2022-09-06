@@ -64,8 +64,13 @@ if (process.env.SESSION_KEY == undefined)
 	throw new Error("SESSION_KEY is not available");
 
 if (dev || pkg) {
+	const SQLiteStore = require("connect-sqlite3")(session);
 	app.use(
 		session({
+			store: new SQLiteStore({
+				db: "sessions.sqlite",
+				dir: "./data",
+			}),
 			secret: process.env.SESSION_KEY,
 			resave: false,
 			unset: "destroy",
