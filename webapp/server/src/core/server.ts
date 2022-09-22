@@ -111,10 +111,14 @@ app.use(passport.initialize());
 app.use((req, res, next) => {
 	if (req.url.match(/\/(?:auth|serve|manage|api)/))
 		passport.authenticate("session", (err: any, user: any, info: any) => {
-			if (err) req.logOut();
+			if (err) {
+				req.logout((err: any) => {
+					if (err) return next(err);
+				});
+			}
 			if (!user) return res.redirect("/auth/login");
 
-			req.logIn(user, (err) => {
+			req.login(user, (err) => {
 				if (err) return next(err);
 				return next();
 			});

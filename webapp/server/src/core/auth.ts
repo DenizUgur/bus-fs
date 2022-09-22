@@ -125,10 +125,12 @@ router.get("/fail", (req, res) => {
 	});
 });
 
-router.get("/logout", (req, res) => {
+router.get("/logout", (req, res, next) => {
 	req.session.destroy((err: any) => {
-		req.logOut();
-		res.redirect("http://lms.ozyegin.edu.tr");
+		req.logout((err: any) => {
+			if (err) return next(err);
+			res.redirect("http://lms.ozyegin.edu.tr");
+		});
 	});
 });
 

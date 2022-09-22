@@ -13,5 +13,6 @@ declare namespace Express {
 			privileges: string[];
 		};
 		session: any;
+		logout: any;
 	}
 }
