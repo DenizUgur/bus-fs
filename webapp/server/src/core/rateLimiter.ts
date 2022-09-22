@@ -2,7 +2,7 @@
  * @author Deniz Ugur <deniz343@gmail.com>
  */
 import sequelize from "../db";
-import { RateLimiterPostgres } from "rate-limiter-flexible";
+import { RateLimiterPostgres, RateLimiterMemory } from "rate-limiter-flexible";
 
 const opts = {
 	keyPrefix: "rlDefault",
@@ -16,7 +16,7 @@ const opts = {
 
 const pkg = (<any>process).pkg ? true : false;
 const dev = process.env.NODE_ENV !== "production";
-const rateLimiterDefault = new RateLimiterPostgres(opts);
+const rateLimiterDefault = pkg ? new RateLimiterMemory(opts) : new RateLimiterPostgres(opts);
 
 const rateLimiterMiddleware = (req: any, res: any, next: any) => {
 	if (dev) return next();
