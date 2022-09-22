@@ -88,7 +88,8 @@
 			"./node_modules/sqlite3/lib/binding/napi-v6-linux-glibc-x64/node_sqlite3.node"
 		],
 		"scripts": [
-			"./node_modules/@adminjs/design-system/bundle.development.js"
+			"./node_modules/@adminjs/design-system/bundle.development.js",
+			"./node_modules/@adminjs/design-system/bundle.production.js"
 		],
 		"targets": [
 			"node16-linux"
