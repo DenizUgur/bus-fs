@@ -109,9 +109,6 @@ router.get("/download", async (req, res) => {
 	const type = req.session.type || process.env.FALLBACK_TYPE;
 	let file: any = await isAvailable(type, req.user.level);
 
-	//* File has been served, we don't need a session anymore
-	delete req.session;
-
 	if (!file.enabled)
 		return res.render("index", {
 			message: "This assignment is not available yet.",

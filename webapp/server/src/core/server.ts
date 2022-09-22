@@ -73,11 +73,9 @@ if (dev || pkg) {
 			}),
 			secret: process.env.SESSION_KEY,
 			resave: false,
-			unset: "destroy",
 			saveUninitialized: false,
 			cookie: {
-				secure: false,
-				sameSite: "lax",
+				secure: true,
 			},
 		})
 	);
