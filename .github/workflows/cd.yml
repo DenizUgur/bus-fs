@@ -9,15 +9,15 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v3
 
-            - name: npm ci and pack
+            - name: npm install and pack
               run: |
                   cd webapp/server
-                  npm ci
+                  npm install
                   npm run pack
 
             - name: Upload packaged binaries
               uses: actions/upload-artifact@v3
               with:
-                  name: Binaries
-                  path: webapp/server/dist/*
+                  name: Linux binary
+                  path: webapp/server/dist/server
                   retention-days: 1

@@ -1,6 +1,7 @@
 /**
  * @author Deniz Ugur <deniz343@gmail.com>
  */
+import sqlite3 from "sqlite3";
 import { Sequelize, DataTypes } from "sequelize";
 import path from "path";
 import { aws_delete } from "../core/aws";
@@ -13,6 +14,7 @@ if (!dev) {
 	if (pkg) {
 		sequelize = new Sequelize({
 			dialect: "sqlite",
+			dialectModule: sqlite3,
 			storage: path.join(process.cwd(), "data", "db.sqlite"),
 		});
 	} else {
