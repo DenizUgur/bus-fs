@@ -80,10 +80,7 @@ app.use("/serve", [isAuthenticated, rateLimiterMiddleware, routerServe]);
 
 app.get("/f/:type", (req, res, next) => {
 	req.session.type = req.params.type;
-	return res.render("index", {
-		message: "Redirecting you to your assignment.",
-		session: true,
-	});
+	return res.redirect("/serve");
 });
 
 app.get("/", (req, res) => {

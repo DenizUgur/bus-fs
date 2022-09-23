@@ -61,7 +61,7 @@ const shuffle = (array: string[]) => {
 };
 
 router.get("/", async (req, res) => {
-	const type = req.session.type || process.env.FALLBACK_TYPE;
+	const type = req.session.type;
 	let file: any = await isAvailable(type, req.user.level);
 
 	if (!file.enabled)
@@ -106,7 +106,7 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/download", async (req, res) => {
-	const type = req.session.type || process.env.FALLBACK_TYPE;
+	const type = req.session.type;
 	let file: any = await isAvailable(type, req.user.level);
 
 	if (!file.enabled)

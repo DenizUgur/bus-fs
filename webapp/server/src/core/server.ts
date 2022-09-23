@@ -3,6 +3,7 @@
  */
 import express from "express";
 import cors from "cors";
+import morgan from "morgan";
 import path from "path";
 import { createClient } from "redis";
 import methodOverride from "method-override";
@@ -59,6 +60,7 @@ app.use(
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride());
 app.use(cookieParser());
+app.use(morgan("dev"));
 
 if (process.env.SESSION_KEY == undefined)
 	throw new Error("SESSION_KEY is not available");

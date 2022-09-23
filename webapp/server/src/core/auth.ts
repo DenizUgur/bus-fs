@@ -110,7 +110,7 @@ router.get("/openid/return", (req, res, next) => {
 router.post("/openid/return", (req, res, next) => {
 	passport.authenticate("azuread-openidconnect", {
 		response: res,
-		successReturnToOrRedirect: "/serve",
+		successReturnToOrRedirect: `/f/${req.session.type}`,
 		failureRedirect: "/auth/fail",
 	})(req, res, next);
 });
