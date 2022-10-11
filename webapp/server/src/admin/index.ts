@@ -11,18 +11,18 @@ import { isAuthenticated, isSeniorTA } from "../core/auth";
 import routerApi from "./api";
 
 const isSuperUser = ({ currentAdmin }: any) => {
-	return currentAdmin && currentAdmin.level >= 300;
+	return currentAdmin && currentAdmin.level >= 400;
 };
 
 const isManager = ({ currentAdmin }: any) => {
-	return currentAdmin && currentAdmin.level >= 200;
+	return currentAdmin && currentAdmin.level >= 300;
 };
 
 const canEditFile = ({ currentAdmin, record }: any) => {
 	return (
 		currentAdmin &&
 		(isManager({ currentAdmin }) ||
-			currentAdmin.privileges.includes(record.params.name))
+			currentAdmin.privileges?.editFiles?.includes(record.params.name))
 	);
 };
 

@@ -82,7 +82,7 @@ const User = sequelize.define(
 		},
 		privileges: {
 			type: DataTypes.JSON,
-			defaultValue: [],
+			defaultValue: {},
 		},
 	},
 	{
@@ -133,8 +133,8 @@ const FileAccess = sequelize.define(
 			afterDestroy: async (file: any, _) => {
 				if (file.files) {
 					try {
-						await aws_delete(file.files.macrofree.aws);
-						await aws_delete(file.files.macroenabled.aws);
+						for (const key of Object.values(file.files))
+							await aws_delete((key as any).aws);
 					} catch (_) {}
 				}
 			},

@@ -20,8 +20,18 @@ type Cell = {
 	state: "added" | "deleted" | "modified" | null;
 	email: string;
 	sid: string;
+	privileges: object;
 	displayName: string | undefined;
 	level: number | undefined;
+};
+
+type AWSFile = {
+	[key: string]: {
+		aws: string;
+		actual: string;
+		out: string;
+		file?: FileUpload.UploadedFile;
+	};
 };
 
 const _cell = (sheet: any) => {
@@ -63,6 +73,7 @@ router.post("/user", async (req, res) => {
 		let columns: any = {
 			email: null,
 			student_id: null,
+			privileges: null,
 		};
 		if (isTA) {
 			columns.displayName = null;
@@ -84,6 +95,7 @@ router.post("/user", async (req, res) => {
 			let user: Cell = {
 				email: cell(columns.email, i),
 				sid: cell(columns.student_id, i),
+				privileges: cell(columns.privileges, i),
 				state: null,
 				displayName: undefined,
 				level: undefined,
@@ -106,7 +118,8 @@ router.post("/user", async (req, res) => {
 							(e.dataValues.level != user.level ||
 								e.dataValues.displayName !=
 									user.displayName)) ||
-						e.dataValues.sid != user.sid
+						e.dataValues.sid != user.sid ||
+						e.dataValues.privileges != user.privileges
 							? "modified"
 							: null;
 					return true;
@@ -130,6 +143,7 @@ router.post("/user", async (req, res) => {
 				data.push({
 					email: user.dataValues.email,
 					sid: user.dataValues.sid,
+					privileges: user.dataValues.privileges,
 					level: user.dataValues.level,
 					displayName: user.dataValues.displayName,
 					state: "deleted",
@@ -150,6 +164,7 @@ router.post("/user", async (req, res) => {
 								displayName: user.email,
 								email: user.email,
 								sid: user.sid,
+								privileges: user.privileges,
 								level: user.level,
 								enrolled: false,
 							},
@@ -172,6 +187,7 @@ router.post("/user", async (req, res) => {
 								displayName: user.displayName,
 								level: user.level,
 								sid: user.sid,
+								privileges: user.privileges,
 							},
 							{ transaction }
 						);
@@ -203,8 +219,12 @@ router.post("/user", async (req, res) => {
 });
 
 router.post("/file/:fileid", async (req, res) => {
-	if (!req.files?.macroenabled || !req.files?.macrofree)
-		return res.status(400).send("Not enough files has been supplied.");
+	if (!req.files?.macrofree)
+		return res
+			.status(400)
+			.send(
+				"Not enough files has been supplied. Submit at least macro free file."
+			);
 	const fileID = req.params.fileid;
 
 	//* Get current state of the file
@@ -216,24 +236,27 @@ router.post("/file/:fileid", async (req, res) => {
 	if (initialState) await file.update({ enabled: false });
 
 	//* Generate keys
-	const keys = {
+	const files: AWSFile = {
 		macrofree: {
 			aws: `${fileID}/${nanoid()}_free`,
 			actual: `${fileID}_template.xlsx`,
 			out: `${fileID}_template_xlsx`,
+			file: req.files.macrofree as FileUpload.UploadedFile,
 		},
-		macroenabled: {
-			aws: `${fileID}/${nanoid()}_macro`,
-			actual: `${fileID}_template.xlsm`,
-			out: `${fileID}_template_xlsm`,
-		},
+		...(req.files?.macroenabled && {
+			macroenabled: {
+				aws: `${fileID}/${nanoid()}_macro`,
+				actual: `${fileID}_template.xlsm`,
+				out: `${fileID}_template_xlsm`,
+				file: req.files.macroenabled as FileUpload.UploadedFile,
+			},
+		}),
 	};
 
 	const rollback = async (error: any, restore = true) => {
 		console.error(error);
 		await fs.rm(`/tmp/${fileID}`, { recursive: true, force: true });
-		await aws_delete(keys.macrofree.aws);
-		await aws_delete(keys.macroenabled.aws);
+		for (const file of Object.values(files)) await aws_delete(file.aws);
 		await file.update({ enabled: restore ? initialState : false });
 		return res
 			.status(500)
@@ -246,56 +269,48 @@ router.post("/file/:fileid", async (req, res) => {
 
 	//* Upload files
 	let response;
-	let freeFile: any, enabledFile: any;
-	// Macro Free
-	freeFile = req.files.macrofree;
-	response = await aws_upload({
-		key: keys.macrofree.aws,
-		body: freeFile.data,
-	});
-	if (response.error) return await rollback(response.error);
-
-	// Macro Enabled
-	enabledFile = req.files.macroenabled;
-	response = await aws_upload({
-		key: keys.macroenabled.aws,
-		body: enabledFile.data,
-	});
-	if (response.error) return await rollback(response.error);
+	for (const file of Object.values(files)) {
+		if (file?.file?.data == null) continue;
+		response = await aws_upload({
+			key: file.aws,
+			body: file.file.data,
+		});
+		if (response.error) return await rollback(response.error);
+	}
 
 	//* Save files to a temporary destination
 	try {
 		await fs.rm(`/tmp/${fileID}`, { recursive: true, force: true });
 		await fs.mkdir(`/tmp/${fileID}`);
-		await fs.writeFile(`/tmp/${keys.macrofree.aws}`, freeFile.data);
-		await fs.writeFile(`/tmp/${keys.macroenabled.aws}`, enabledFile.data);
+		for (const file of Object.values(files)) {
+			if (file?.file?.data == null) continue;
+			await fs.writeFile(`/tmp/${file.aws}`, file.file.data);
+		}
 	} catch (error) {
 		return await rollback(error);
 	}
 
 	//* Swap with current files
 	try {
-		await fs.rm(`./data/out/unzipped/${keys.macrofree.out}`, {
-			recursive: true,
-			force: true,
-		});
-		await fs.rm(`./data/out/unzipped/${keys.macroenabled.out}`, {
-			recursive: true,
-			force: true,
-		});
-		await fs.copyFile(
-			`/tmp/${keys.macrofree.aws}`,
-			`./data/templates/${keys.macrofree.actual}`
-		);
-		await fs.copyFile(
-			`/tmp/${keys.macroenabled.aws}`,
-			`./data/templates/${keys.macroenabled.actual}`
-		);
+		for (const file of Object.values(files)) {
+			await fs.rm(`./data/out/unzipped/${file.out}`, {
+				recursive: true,
+				force: true,
+			});
+
+			await fs.copyFile(
+				`/tmp/${file.aws}`,
+				`./data/templates/${file.actual}`
+			);
+		}
 	} catch (error) {
 		return await rollback(error, false);
 	}
 
 	//* Update keys on database and restore initial state
+	let keys = Object.assign({}, files);
+	delete keys.macrofree?.file;
+	if (req.files?.macroenabled) delete keys.macroenabled?.file;
 	await file.update({ files: keys, enabled: initialState });
 
 	return res.sendStatus(200);
@@ -320,22 +335,16 @@ const flushFiles = () => {
 			//* Download files from AWS
 			try {
 				for (const file of files) {
-					let keys = file.getDataValue("files");
-					let response: any = await aws_download(keys.macrofree.aws);
+					let keys: AWSFile = file.getDataValue("files");
 
-					if (response.error) throw new Error(response.error);
-					await fs.writeFile(
-						`./data/templates/${keys.macrofree.actual}`,
-						response.file
-					);
-
-					response = await aws_download(keys.macroenabled.aws);
-
-					if (response.error) throw new Error(response.error);
-					await fs.writeFile(
-						`./data/templates/${keys.macroenabled.actual}`,
-						response.file
-					);
+					for (const key of Object.values(keys)) {
+						let response: any = await aws_download(key.aws);
+						if (response.error) throw new Error(response.error);
+						await fs.writeFile(
+							`./data/templates/${key.actual}`,
+							response.file
+						);
+					}
 				}
 			} catch (error) {
 				console.error(error);

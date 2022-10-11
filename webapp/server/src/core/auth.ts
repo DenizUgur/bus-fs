@@ -145,8 +145,8 @@ const isAuthenticated = async (req: Request, res: Response, next: any) => {
 			oid: "test_oid",
 			email: "deniz.ugur@ozu.edu.tr",
 			enrolled: true,
-			level: 300,
-			privileges: [],
+			level: 400,
+			privileges: {},
 		};
 		await User.upsert(req.user);
 		// Copy user to adminUser for AdminBro compatibility

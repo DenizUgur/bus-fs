@@ -26,9 +26,7 @@ export default function fileUpload(props) {
 	const fileHandler = (origin, file) => {
 		let newState = Object.assign({}, state);
 		newState[origin] = file;
-		newState.valid =
-			newState.macro_enabled != undefined &&
-			newState.macro_free != undefined;
+		newState.valid = newState.macro_free != undefined;
 		setState(newState);
 	};
 
@@ -66,18 +64,14 @@ export default function fileUpload(props) {
 			<Parent>
 				<DropArea>
 					<FileDropzone
-						title="Macro-enabled File"
+						title="Macro-enabled File (Optional)"
 						macro={true}
-						callback={(file) =>
-							fileHandler("macro_enabled", file)
-						}
+						callback={(file) => fileHandler("macro_enabled", file)}
 					/>
 					<FileDropzone
 						title="Macro-free File"
 						macro={false}
-						callback={(file) =>
-							fileHandler("macro_free", file)
-						}
+						callback={(file) => fileHandler("macro_free", file)}
 					/>
 				</DropArea>
 				<SubmitContainer>

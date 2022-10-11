@@ -10,7 +10,10 @@ declare namespace Express {
 			sid: string;
 			enrolled: boolean;
 			level: number;
-			privileges: string[];
+			privileges: {
+				editFiles?: string[];
+				prohibitedTag?: string;
+			};
 		};
 		session: any;
 		logout: any;

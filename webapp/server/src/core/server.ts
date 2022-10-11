@@ -77,7 +77,7 @@ if (dev || pkg) {
 			resave: false,
 			saveUninitialized: false,
 			cookie: {
-				secure: true,
+				secure: !dev,
 			},
 		})
 	);

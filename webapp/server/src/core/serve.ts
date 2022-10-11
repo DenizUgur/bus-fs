@@ -70,6 +70,13 @@ router.get("/", async (req, res) => {
 			serve: false,
 		});
 
+	const prohibitedTag = req.user?.privileges?.prohibitedTag;
+	if (prohibitedTag && type.includes(prohibitedTag))
+		return res.render("index", {
+			message: "You are not allowed to access this assignment.",
+			serve: false,
+		});
+
 	let ta_names: any = [];
 	let valid_index = 0;
 	if (req.user.level >= 150) {
@@ -159,10 +166,11 @@ router.get("/download", async (req, res) => {
 
 	//* Decide preferences
 	const encrypt = file.encrypt && !(access && !access.encrypt);
-	const extension = access?.macrofree ? "xlsx" : "xlsm";
+	const hasXLSM = !!file.files.macroenabled;
+	const extension = access?.macrofree || !hasXLSM ? "xlsx" : "xlsm";
 
 	exec_prom(
-		`python3 ${pkg ? "./data/worker/app.py" : "../worker/app.py"} ${[
+		`python3 ./data/worker/app.py ${[
 			type,
 			req.user.sid,
 			extension,
