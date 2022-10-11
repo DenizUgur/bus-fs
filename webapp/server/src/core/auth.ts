@@ -156,6 +156,13 @@ const isAuthenticated = async (req: Request, res: Response, next: any) => {
 
 	if (req.isAuthenticated()) {
 		if (req.user) {
+			try {
+				// @ts-ignore: Sqlite workaround
+				req.user.privileges = JSON.parse(req.user.privileges);
+			} catch (error) {
+				req.user.privileges = {};
+			}
+
 			// Copy user to adminUser for AdminBro compatibility
 			req.session.adminUser = req.user;
 

@@ -6,33 +6,11 @@ import { Sequelize, DataTypes } from "sequelize";
 import path from "path";
 import { aws_delete } from "../core/aws";
 
-const pkg = (<any>process).pkg ? true : false;
-const dev = process.env.NODE_ENV !== "production";
-
-let sequelize: Sequelize;
-if (!dev) {
-	if (pkg) {
-		sequelize = new Sequelize({
-			dialect: "sqlite",
-			dialectModule: sqlite3,
-			storage: path.join(process.cwd(), "data", "db.sqlite"),
-		});
-	} else {
-		if (process.env.DATABASE_URL == undefined)
-			throw new Error("DATABASE_URL is not available");
-
-		sequelize = new Sequelize(process.env.DATABASE_URL, {
-			dialect: "postgres",
-			dialectOptions: {
-				ssl: false,
-			},
-		});
-	}
-} else {
-	sequelize = new Sequelize("postgres://admin:root@localhost:5432/busfs", {
-		dialect: "postgres",
-	});
-}
+const sequelize = new Sequelize({
+	dialect: "sqlite",
+	dialectModule: sqlite3,
+	storage: path.join(process.cwd(), "data", "db.sqlite"),
+});
 
 const RateLimit = sequelize.define(
 	"ratelimit",
@@ -81,8 +59,8 @@ const User = sequelize.define(
 			defaultValue: 0,
 		},
 		privileges: {
-			type: DataTypes.JSON,
-			defaultValue: {},
+			type: DataTypes.STRING,
+			defaultValue: "{}",
 		},
 	},
 	{

@@ -32,7 +32,6 @@
 -   AWS_SECRET_ACCESS_KEY: This is the secret key for the AWS S3 bucket.
 -   S3_BUCKET_NAME: This is the name of the AWS S3 bucket.
 -   ORIGIN_HOST: This is the host of the server. (i.e. https://denizugur.dev)
--   DATABASE_URL\*: This is the database URL. (i.e. postgresql://user:password@host:port/database)
 -   REDIS_URL\*: This is the redis URL. (i.e. redis://host:port)
 
 > \* These are optional. Just enter a random string if using the packaged version.
